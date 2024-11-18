@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--[if IE 7]>         <html class="no-js ie7"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js ie8"> <![endif]-->
+<!--[if IE 9]>         <html class="no-js ie9"> <![endif]-->
+<!--[if gt IE 9]><!--> <html class="no-js"> <!--<![endif]-->
+	<head>		
+		<meta name="description" content="EX6110">
+		<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<META http-equiv="Content-Style-Type" content="text/css">
+		<META http-equiv="Pragma" content="no-cache">
+		<META HTTP-equiv="Cache-Control" content="no-cache">
+		<META HTTP-EQUIV="Expires" CONTENT="Mon, 06 Jan 1990 00:00:01 GMT">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link href="/html/skin/image/favicon.ico" mce_href="/html/skin/image/favicon.ico" rel="bookmark" type="image/x-icon" />
+		<link href="/html/skin/image/favicon.ico" mce_href="/html/skin/image/favicon.ico" rel="icon" type="image/x-icon" />
+		<link href="/html/skin/image/favicon.ico" mce_href="/html/skin/image/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+	
+<script language="JavaScript"><!--
+document.write('<FRAMESET border="0" rows="1,*" cols="*" frameBorder="NO" frameSpacing="0" id="all">');
+document.write('<FRAME name="arcFrame" src=""  noResize frameborder="NO"></FRAME>');
+var url = "/cgi-bin/webproc";
+var Cookie = {
+    Get : function(name){
+        var arrStr = document.cookie.split("; ");
+        for(var i = 0;i < arrStr.length;i ++){
+            var temp = arrStr[i].split("=");
+            if(temp[0] == name) 
+                return temp[1];
+        }
+        return null;
+    },
+	 Set : function(name, value, hours, path){
+        var str = name + "=" + value;
+        if(hours != undefined && hours > 0){
+            var date = new Date();
+            var ms = hours * 3600 * 1000;
+            date.setTime(date.getTime() + ms);
+            str += "; expires=" + date.toGMTString();
+        }
+        if(path == undefined){
+			path = "/";
+		}
+        str += "; path=" + path;
+        document.cookie = str;
+    },
+	Delete :function(name, path){
+        var date = new Date();
+		var str;
+        date.setTime(date.getTime() - 10000);
+		
+        if(path == undefined){
+            path = "/";
+		}
+        str += "; path=" + path;
+        document.cookie = name + "=; expires=" + date.toGMTString() + str;
+    }
+}
+var browser=top.location.href;
+if((browser.indexOf("session_id_wireless") > -1) || (browser.indexOf("session_id_wizard") > -1))
+{
+	var strsessionid = browser.split("?")[1].split("=")[1];
+	Cookie.Set('session_id', strsessionid);	
+}
+if(browser.indexOf("session_id_wireless") > -1 || Cookie.Get('changeurl') == "wireless")
+{
+	strsessionid = Cookie.Get('session_id');
+	url="/wifiSettings.html"+"&var:session_id="+strsessionid;
+	Cookie.Set('changeurl', "wireless");
+}	
+else if(browser.indexOf("session_id_wizard") > -1 || Cookie.Get('changeurl') == "wizard")
+{
+	strsessionid = Cookie.Get('session_id');
+    url="/screen6-extender-single.html"+"&var:session_id="+strsessionid;
+	Cookie.Set('changeurl', "wizard");
+}
+if((browser.indexOf("session_id_wireless") > -1) || (browser.indexOf("session_id_wizard") > -1))
+{   
+	window.parent.document.getElementById("all").rows = ("*,0");  
+	setTimeout("top.location.href='/';",1000);
+}
+else
+{
+	Cookie.Delete('changeurl','/');
+	Cookie.Delete('session_id','/');
+}
+document.write('<FRAME name="mainFrame" src="' + url + '" frameborder="NO"></FRAME>');
+document.write('</FRAMESET>');
+--></script></head>
+
+
+</html>
+
