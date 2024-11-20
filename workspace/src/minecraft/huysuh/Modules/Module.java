@@ -37,6 +37,8 @@ public class Module implements Serializable {
         this.keyCode = keyCode;
     }
 
+    public Float lastYPosition;
+
     // Module event handlers
     protected void onEnable() {}
     protected void onDisable() {}

@@ -15,7 +15,7 @@ public class Event {
         PRE, POST
     }
 
-    public void fire(Era era) {
+    public Event fire(Era era) {
         this.era = era;
         for (Module module : Module.getModules()) {
             if (module.isEnabled()) {
@@ -23,19 +23,22 @@ public class Event {
                 module.onEvent(this);
             }
         }
+        return this;
     }
 
-    public void fire() {
+    public Event fire() {
         //Wrapper.addChatMessage(this.getClass().getSimpleName() + " fired");
         fire(Era.PRE);
         if (!isCancelled()) {
             fire(Era.POST);
         }
+        return this;
     }
 
     public Era getEra() {
         return era;
     }
+    public void setEra(Era era) { this.era = era; }
 
     public boolean isPre() {
         return era == Era.PRE;

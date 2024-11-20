@@ -2,6 +2,9 @@ package huysuh;
 
 import huysuh.Events.Event;
 import huysuh.Modules.Module;
+import huysuh.Modules.impl.Combat.KillAura;
+import huysuh.Modules.impl.Render.Animations;
+import huysuh.Modules.impl.Render.Camera;
 import huysuh.Modules.impl.Render.ClickGUI;
 import huysuh.Modules.impl.Render.HUD;
 import net.minecraft.client.Minecraft;
@@ -20,7 +23,10 @@ public class Solace {
 
     private static final List<Module> modules = new ArrayList<Module>(Arrays.asList(
             new HUD(),
-            new ClickGUI()
+            new ClickGUI(),
+            new KillAura(),
+            new Animations(),
+            new Camera()
     ));
 
     private static final List<Event> tickEvents = new ArrayList<>(Collections.emptyList());
@@ -30,7 +36,6 @@ public class Solace {
 
         mc = Minecraft.getMinecraft();
 
-        // Debug print before registration
         System.out.println("Total modules to register: " + modules.size());
 
         modules.forEach(module -> {
@@ -38,7 +43,6 @@ public class Solace {
             System.out.println("Registered module: " + module.getName() + " in category: " + module.getCategory().getName());
         });
 
-        // Debug print after registration
         System.out.println("Total registered modules: " + Module.getModules().size());
 
         Event.tickEvents.addAll(tickEvents);

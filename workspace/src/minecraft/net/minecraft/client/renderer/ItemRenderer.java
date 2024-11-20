@@ -1,5 +1,9 @@
 package net.minecraft.client.renderer;
 
+import huysuh.Events.impl.EventTransformFirstPersonItem;
+import huysuh.Modules.Module;
+import huysuh.Modules.impl.Combat.KillAura;
+import huysuh.Modules.impl.Render.Animations;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -21,15 +25,14 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
 import net.minecraft.src.Config;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumWorldBlockLayer;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.*;
 import net.minecraft.world.storage.MapData;
 import net.optifine.DynamicLights;
 import net.optifine.reflect.Reflector;
 import net.optifine.shaders.Shaders;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 public class ItemRenderer
@@ -98,7 +101,7 @@ public class ItemRenderer
 
     /**
      * Rotate the render around X and Y
-     *  
+     *
      * @param angleY The angle for the rotation arround Y
      */
     private void rotateArroundXAndY(float angle, float angleY)
@@ -140,7 +143,7 @@ public class ItemRenderer
 
     /**
      * Return the angle to render the Map
-     *  
+     *
      * @param pitch The player's pitch
      */
     private float getMapAngleFromPitch(float pitch)
@@ -233,7 +236,7 @@ public class ItemRenderer
 
     /**
      * Render the player's arm
-     *  
+     *
      * @param equipProgress The progress of equiping the item
      * @param swingProgress The swing movement progression
      */
@@ -266,11 +269,12 @@ public class ItemRenderer
 
     /**
      * Rotate and translate render to show item consumption
-     *  
+     *
      * @param swingProgress The swing movement progress
      */
     private void doItemUsedTransformations(float swingProgress)
     {
+        // X, Y, AND Z POSITION SWING
         float f = -0.4F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI);
         float f1 = 0.2F * MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI * 2.0F);
         float f2 = -0.2F * MathHelper.sin(swingProgress * (float)Math.PI);
@@ -279,7 +283,7 @@ public class ItemRenderer
 
     /**
      * Perform the drinking animation movement
-     *  
+     *
      * @param partialTicks Partials ticks
      */
     private void performDrinking(AbstractClientPlayer clientPlayer, float partialTicks)
@@ -304,22 +308,25 @@ public class ItemRenderer
     /**
      * Performs transformations prior to the rendering of a held item in first person.
      */
-    private void transformFirstPersonItem(float equipProgress, float swingProgress)
-    {
-        GlStateManager.translate(0.56F, -0.52F, -0.71999997F);
-        GlStateManager.translate(0.0F, equipProgress * -0.6F, 0.0F);
+    private void transformFirstPersonItem(float equipProgress, float swingProgress) {
+        // swing progress is NOT the actual swing progress :(
+        EventTransformFirstPersonItem e = new EventTransformFirstPersonItem();
+        if (e.fire().isCancelled()) { return; }
+
+        GlStateManager.translate(e.getTranslationX(), e.getTranslationY(), e.getTranslationZ());
+        GlStateManager.translate(0.0F, equipProgress * e.getItemSwapTranslationY(), 0.0F);
         GlStateManager.rotate(45.0F, 0.0F, 1.0F, 0.0F);
         float f = MathHelper.sin(swingProgress * swingProgress * (float)Math.PI);
         float f1 = MathHelper.sin(MathHelper.sqrt_float(swingProgress) * (float)Math.PI);
         GlStateManager.rotate(f * -20.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(f1 * -20.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(f1 * -80.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.scale(0.4F, 0.4F, 0.4F);
+        GlStateManager.scale(e.getScaleX(), e.getScaleY(), e.getScaleZ());
     }
 
     /**
      * Translate and rotate the render to look like holding a bow
-     *  
+     *
      * @param partialTicks Partial ticks
      */
     private void doBowTransformations(float partialTicks, AbstractClientPlayer clientPlayer)
@@ -352,12 +359,139 @@ public class ItemRenderer
     /**
      * Translate and rotate the render for holding a block
      */
-    private void doBlockTransformations()
-    {
+    private void doBlockTransformations() {
         GlStateManager.translate(-0.5F, 0.2F, 0.0F);
         GlStateManager.rotate(30.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(-80.0F, 1.0F, 0.0F, 0.0F);
         GlStateManager.rotate(60.0F, 0.0F, 1.0F, 0.0F);
+    }
+
+    public void doBlockAnimation(String anim, float f, float f1) {
+        switch (anim) {
+            case "Virtue":
+                this.transformFirstPersonItem(f, f1);
+                doBlockTransformations();
+                GL11.glTranslated(-0.25D, 0.2D, 0.0D);
+                GL11.glTranslatef(-0.05F, this.mc.thePlayer.isSneaking() ? -0.2F : 0.0F, 0.1F);
+                break;
+
+            case "1.8":
+                this.transformFirstPersonItem(f / 2, 0);
+                this.doBlockTransformations();
+                break;
+
+            case "Slash":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glTranslatef(0.1F, 0.2F, 0.3F);
+                GL11.glRotatef(-MathHelper.sin(f1 * f1 * (float)Math.PI) * 30.0F, 1.0F, 0.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Spin":
+                this.transformFirstPersonItem(f, 0);
+                GL11.glRotatef(f1 * 360F, 0.0F, 1.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Swong":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glRotatef(MathHelper.sin(f * (float)Math.PI) * 30.0F, 0.0F, 1.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Push":
+                this.transformFirstPersonItem(f, 0);
+                GL11.glTranslatef(0.0F, MathHelper.sin(f1 * f1 * (float)Math.PI) * 0.2F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Stab":
+                this.transformFirstPersonItem(f, 0);
+                GL11.glTranslatef(0.0F, 0.0F, MathHelper.sin(f1 * (float)Math.PI) * 0.4F);
+                this.doBlockTransformations();
+                break;
+
+            case "Swank":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glRotatef(MathHelper.sin(f * (float)Math.PI) * 20.0F, 0.0F, 0.0F, 1.0F);
+                GL11.glRotatef(MathHelper.cos(f * (float)Math.PI) * 20.0F, 1.0F, 0.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Exhibition":
+                this.transformFirstPersonItem(f, 0);
+                GL11.glRotatef(-MathHelper.sin(f1 * f1 * (float)Math.PI) * 40.0F, 1.0F, 1.0F, 1.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Summer":
+                this.transformFirstPersonItem(f / 2, 0);
+                GL11.glRotatef(MathHelper.cos(f1 * (float)Math.PI) * 20.0F, 1.0F, 0.0F, 1.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Autumn":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glRotatef(MathHelper.sin(f * (float)Math.PI) * 30.0F, 0.0F, 1.0F, 0.0F);
+                GL11.glRotatef(MathHelper.cos(f * (float)Math.PI) * 30.0F, 1.0F, 0.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Winter":
+                this.transformFirstPersonItem(f / 1.5F, 0);
+                GL11.glRotatef(MathHelper.sin(f1 * (float)Math.PI) * 40.0F, 0.0F, 1.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Spring":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glRotatef(MathHelper.cos(f * (float)Math.PI) * 25.0F, 0.0F, 1.0F, 1.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Punch":
+                this.transformFirstPersonItem(f, 0);
+                GL11.glTranslatef(0.0F, 0.0F, MathHelper.sin(f1 * (float)Math.PI) * 0.3F);
+                GL11.glRotatef(-MathHelper.sin(f1 * f1 * (float)Math.PI) * 40.0F, 0.0F, 1.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Zoom":
+                this.transformFirstPersonItem(f, 0);
+                GL11.glTranslatef(0.0F, 0.0F, -MathHelper.sin(f1 * (float)Math.PI) * 0.4F);
+                this.doBlockTransformations();
+                break;
+
+            case "Swing":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glRotatef(MathHelper.sin(f * (float)Math.PI) * 45.0F, 0.0F, 1.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Slide":
+                this.transformFirstPersonItem(f, 0);
+                GL11.glTranslatef(MathHelper.sin(f1 * (float)Math.PI) * 0.3F, 0.0F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Wave":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glRotatef(MathHelper.sin(f * (float)Math.PI) * 20.0F, 0.0F, 0.0F, 1.0F);
+                GL11.glTranslatef(0.0F, MathHelper.cos(f1 * (float)Math.PI) * 0.2F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            case "Tap":
+                this.transformFirstPersonItem(f, f1);
+                GL11.glTranslatef(0.0F, MathHelper.sin(f1 * f1 * (float)Math.PI) * 0.2F, 0.0F);
+                this.doBlockTransformations();
+                break;
+
+            default: // 1.7
+                this.transformFirstPersonItem(f, f1);
+                doBlockTransformations();
+                break;
+        }
     }
 
     /**
@@ -392,21 +526,27 @@ public class ItemRenderer
                     {
                         case NONE:
                             this.transformFirstPersonItem(f, 0.0F);
+
                             break;
 
                         case EAT:
                         case DRINK:
                             this.performDrinking(abstractclientplayer, partialTicks);
-                            this.transformFirstPersonItem(f, 0.0F);
+                            this.transformFirstPersonItem(f, f1);
                             break;
 
                         case BLOCK:
-                            this.transformFirstPersonItem(f, 0.0F);
-                            this.doBlockTransformations();
+                            Animations animations = new Animations();
+                            for (Module m : Module.getModules()){
+                                if (m.getName().equals("Animations")){
+                                    animations = (Animations)m;
+                                }
+                            }
+                            doBlockAnimation(animations.getBlockAnimation(), f, f1);
                             break;
 
                         case BOW:
-                            this.transformFirstPersonItem(f, 0.0F);
+                            this.transformFirstPersonItem(f, f1);
                             this.doBowTransformations(partialTicks, abstractclientplayer);
                     }
                 }
@@ -486,7 +626,7 @@ public class ItemRenderer
 
     /**
      * Render the block in the player's hand
-     *  
+     *
      * @param partialTicks Partial ticks
      * @param atlas The TextureAtlasSprite to render
      */
@@ -520,7 +660,7 @@ public class ItemRenderer
     /**
      * Renders a texture that warps around based on the direction the player is looking. Texture needs to be bound
      * before being called. Used for the water overlay. Args: parialTickTime
-     *  
+     *
      * @param partialTicks Partial ticks
      */
     private void renderWaterOverlayTexture(float partialTicks)
@@ -557,14 +697,16 @@ public class ItemRenderer
 
     /**
      * Renders the fire on the screen for first person mode. Arg: partialTickTime
-     *  
+     *
+     *  klb - idk why this is in itemrenderer like wtfff
+     *
      * @param partialTicks Partial ticks
      */
     private void renderFireInFirstPerson(float partialTicks)
     {
+
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 0.9F);
         GlStateManager.depthFunc(519);
         GlStateManager.depthMask(false);
         GlStateManager.enableBlend();

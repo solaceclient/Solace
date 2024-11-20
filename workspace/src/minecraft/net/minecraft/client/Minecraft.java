@@ -36,6 +36,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import javax.imageio.ImageIO;
 
+import huysuh.Events.Event;
+import huysuh.Events.impl.EventTick;
 import huysuh.Modules.Module;
 import huysuh.Solace;
 import net.minecraft.block.Block;
@@ -1745,6 +1747,9 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     public void runTick() throws IOException
     {
+        Event event = new EventTick();
+        event.fire();
+
         if (this.rightClickDelayTimer > 0)
         {
             --this.rightClickDelayTimer;

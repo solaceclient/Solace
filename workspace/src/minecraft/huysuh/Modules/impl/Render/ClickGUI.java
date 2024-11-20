@@ -80,7 +80,7 @@ public class ClickGUI extends Module {
         @Override
         public void drawScreen(int mouseX, int mouseY, float partialTicks) {
             drawDefaultBackground();
-            GL11.glEnable(GL11.GL_SCISSOR_TEST);
+            //GL11.glEnable(GL11.GL_SCISSOR_TEST);
 
             long currentTime = System.currentTimeMillis();
             float delta = (currentTime - lastFrame) / 50f;
@@ -90,7 +90,7 @@ public class ClickGUI extends Module {
                 panel.draw(mouseX, mouseY, delta);
             }
 
-            GL11.glDisable(GL11.GL_SCISSOR_TEST);
+            //GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
 
             if (draggingPanel != null) {
@@ -138,7 +138,7 @@ public class ClickGUI extends Module {
 
                 int currentY = y + HEADER_HEIGHT - scrollOffset;
                 for (Module module : modules) {
-                    // Module click handling remains the same
+                    // Module click handling
                     if (mouseY >= currentY && mouseY <= currentY + MODULE_HEIGHT) {
                         if (mouseButton == 0) {
                             module.toggle();
@@ -156,50 +156,23 @@ public class ClickGUI extends Module {
                         for (Setting setting : module.getSettings()) {
                             if (!setting.isVisible()) continue;
 
-                            // Check if click is within the setting's base area
-                            boolean isSettingClicked = mouseY >= currentY && mouseY <= currentY + SETTING_HEIGHT;
-
-                            // For ColorSetting, also check expanded area if it's expanded
-                            boolean isExpandedColorArea = false;
-                            if (setting instanceof ColorSetting) {
-                                ColorSetting colorSetting = (ColorSetting) setting;
-                                if (colorSetting.isExpanded()) {
-                                    int expandedHeight = SETTING_HEIGHT + 80 + 8 + 8 + PADDING * 3; // Color picker height
-                                    isExpandedColorArea = mouseY >= currentY && mouseY <= currentY + expandedHeight;
-                                }
+                            int settingHeight = SETTING_HEIGHT;
+                            if (setting instanceof ColorSetting && ((ColorSetting) setting).isExpanded()) {
+                                settingHeight += 80 + 8 + 8 + PADDING * 3; // Color picker expanded height
                             }
 
-                            if (isSettingClicked || isExpandedColorArea) {
-                                if (setting instanceof BooleanSetting) {
-                                    if (mouseButton == 0) {
-                                        ((BooleanSetting) setting).toggle();
-                                        return true;
-                                    }
-                                } else if (setting instanceof ModeSetting) {
-                                    if (mouseButton == 0) {
-                                        ((ModeSetting) setting).cycle();
-                                        return true;
-                                    }
-                                } else if (setting instanceof NumberSetting) {
-                                    if (mouseButton == 0) {
-                                        int sliderWidth = 60;
-                                        int sliderX = x + PANEL_WIDTH - sliderWidth - PADDING;
-                                        if (mouseX >= sliderX && mouseX <= sliderX + sliderWidth) {
-                                            setting.setFocused(true);
-                                            return true;
-                                        }
-                                    }
-                                } else if (setting instanceof ColorSetting) {
+                            boolean isSettingArea = mouseY >= currentY && mouseY <= currentY + settingHeight;
+
+                            if (isSettingArea) {
+                                if (setting instanceof ColorSetting) {
                                     ColorSetting colorSetting = (ColorSetting) setting;
 
-                                    // Handle the expand/collapse click
-                                    if (isSettingClicked && mouseButton == 1) {
+                                    // Handle expand/collapse on right click of main setting area
+                                    if (mouseY <= currentY + SETTING_HEIGHT && mouseButton == 1) {
                                         colorSetting.setExpanded(!colorSetting.isExpanded());
-                                        //Wrapper.addChatMessage(""+colorSetting.isExpanded());
                                         return true;
                                     }
 
-                                    // Only handle color picker interactions if expanded
                                     if (colorSetting.isExpanded() && mouseButton == 0) {
                                         final int COLOR_PICKER_SIZE = 80;
                                         final int HUE_HEIGHT = 8;
@@ -208,7 +181,7 @@ public class ClickGUI extends Module {
                                         int pickerY = currentY + SETTING_HEIGHT;
                                         int pickerX = x + PADDING;
 
-                                        // Handle color picker area clicks
+                                        // Color picker area
                                         if (mouseY >= pickerY + PADDING &&
                                                 mouseY <= pickerY + PADDING + COLOR_PICKER_SIZE &&
                                                 mouseX >= pickerX &&
@@ -222,7 +195,7 @@ public class ClickGUI extends Module {
                                             return true;
                                         }
 
-                                        // Handle hue slider clicks
+                                        // Hue slider
                                         int hueY = pickerY + PADDING + COLOR_PICKER_SIZE + PADDING;
                                         if (mouseY >= hueY && mouseY <= hueY + HUE_HEIGHT &&
                                                 mouseX >= pickerX && mouseX <= pickerX + COLOR_PICKER_SIZE) {
@@ -231,7 +204,7 @@ public class ClickGUI extends Module {
                                             return true;
                                         }
 
-                                        // Handle alpha slider clicks
+                                        // Alpha slider
                                         int alphaY = hueY + HUE_HEIGHT + PADDING;
                                         if (mouseY >= alphaY && mouseY <= alphaY + ALPHA_HEIGHT &&
                                                 mouseX >= pickerX && mouseX <= pickerX + COLOR_PICKER_SIZE) {
@@ -240,14 +213,18 @@ public class ClickGUI extends Module {
                                             return true;
                                         }
                                     }
+                                } else if (setting instanceof BooleanSetting && mouseButton == 0) {
+                                    ((BooleanSetting) setting).toggle();
+                                    return true;
+                                } else if (setting instanceof ModeSetting && mouseButton == 0) {
+                                    ((ModeSetting) setting).cycle();
+                                    return true;
+                                } else if (setting instanceof NumberSetting && mouseButton == 0) {
+                                    setting.setFocused(true);
+                                    return true;
                                 }
                             }
 
-                            // Increment currentY based on setting height
-                            int settingHeight = SETTING_HEIGHT;
-                            if (setting instanceof ColorSetting && ((ColorSetting) setting).isExpanded()) {
-                                settingHeight += 80 + 8 + 8 + PADDING * 3; // Color picker expanded height
-                            }
                             currentY += settingHeight;
                         }
                     }
@@ -330,6 +307,9 @@ public class ClickGUI extends Module {
                                 drawSetting(setting, currentY, mouseX, mouseY);
 
                                 currentY += SETTING_HEIGHT;
+                                if (setting instanceof ColorSetting && ((ColorSetting) setting).isExpanded()) {
+                                    currentY += 80 + 8 + 8 + PADDING * 3 + 5;
+                                }
                             }
                         }
                     }
@@ -350,6 +330,10 @@ public class ClickGUI extends Module {
 
             private void drawColorSetting(ColorSetting setting, int y, int mouseX, int mouseY) {
                 final int COLOR_PREVIEW_SIZE = 12;
+                final int COLOR_PICKER_SIZE = 80;
+                final int HUE_HEIGHT = 8;
+                final int ALPHA_HEIGHT = 8;
+                final int EXPANDED_HEIGHT = COLOR_PICKER_SIZE + HUE_HEIGHT + ALPHA_HEIGHT + PADDING * 3;
 
                 // Draw setting name
                 fontRenderer.drawString(setting.getName(),
@@ -380,17 +364,13 @@ public class ClickGUI extends Module {
 
                 // Draw expanded color picker
                 if (setting.isExpanded()) {
-                    GL11.glDisable(GL11.GL_SCISSOR_TEST);  // Disable clipping
-                    final int COLOR_PICKER_SIZE = 80;
-                    final int HUE_HEIGHT = 8;
-                    final int ALPHA_HEIGHT = 8;
+                    //GL11.glDisable(GL11.GL_SCISSOR_TEST);  // Disable clipping
 
                     int pickerY = y + SETTING_HEIGHT;
-                    int pickerX = x + 5;
+                    int pickerX = x + PADDING;
 
                     // Draw color picker background
-                    Gui.drawRect(x, pickerY, x + PANEL_WIDTH,
-                            pickerY + COLOR_PICKER_SIZE + HUE_HEIGHT + ALPHA_HEIGHT + PADDING * 3, SETTING_COLOR);
+                    Gui.drawRect(x, pickerY, x + PANEL_WIDTH, pickerY + EXPANDED_HEIGHT + 5, SETTING_COLOR);
 
                     // Draw main color picker area
                     drawColorPickerRect(pickerX, pickerY + PADDING,
@@ -425,6 +405,8 @@ public class ClickGUI extends Module {
                     Gui.drawRect(alphaIndicatorX - 1, alphaY - 1,
                             alphaIndicatorX + 1, alphaY + ALPHA_HEIGHT + 1,
                             Color.WHITE.getRGB());
+
+                    //GL11.glEnable(GL11.GL_SCISSOR_TEST);  // Re-enable clipping
                 }
             }
 
@@ -499,9 +481,10 @@ public class ClickGUI extends Module {
             private void drawNumberSetting(NumberSetting setting, int y, int mouseX, int mouseY) {
                 // Constants for layout
                 final int SLIDER_WIDTH = 60;
-                final int VALUE_GAP = 8;
-                final int SLIDER_X = x + PANEL_WIDTH - SLIDER_WIDTH - PADDING;
-                final int SLIDER_Y = y + SETTING_HEIGHT / 2;
+                final int SLIDER_HEIGHT = 4; // Height of the slider
+                final int SLIDER_Y_OFFSET = 4; // Space between text and slider
+                final int SLIDER_X = x + PADDING; // Align with the left padding
+                final int SLIDER_Y = y + SETTING_HEIGHT - SLIDER_HEIGHT - SLIDER_Y_OFFSET;
 
                 // Calculate the maximum width available for the setting name
                 String value = String.format("%.1f", setting.getValue());
@@ -509,10 +492,11 @@ public class ClickGUI extends Module {
                     value += setting.getIcon().icon;
                 }
                 int valueWidth = fontRenderer.getStringWidth(value);
-                int maxNameWidth = SLIDER_X - x - PADDING - VALUE_GAP - valueWidth;
 
                 // Draw setting name (truncated if necessary)
                 String name = setting.getName();
+                int maxNameWidth = PANEL_WIDTH - 2 * PADDING;
+
                 if (fontRenderer.getStringWidth(name) > maxNameWidth) {
                     while (fontRenderer.getStringWidth(name + "...") > maxNameWidth && name.length() > 0) {
                         name = name.substring(0, name.length() - 1);
@@ -522,24 +506,24 @@ public class ClickGUI extends Module {
 
                 fontRenderer.drawString(name,
                         x + PADDING,
-                        y + (SETTING_HEIGHT - fontRenderer.getHeight()) / 2f,
+                        y,
                         TEXT_COLOR);
 
-                // Draw value before slider
+                // Draw value next to the setting name
                 fontRenderer.drawString(value,
-                        SLIDER_X - VALUE_GAP - fontRenderer.getStringWidth(value),
-                        y + (SETTING_HEIGHT - fontRenderer.getHeight()) / 2f,
+                        x + PANEL_WIDTH - PADDING - valueWidth,
+                        y,
                         TEXT_COLOR);
 
                 // Draw slider background
-                Gui.drawRect(SLIDER_X, SLIDER_Y - 1, SLIDER_X + SLIDER_WIDTH, SLIDER_Y + 1,
+                Gui.drawRect(SLIDER_X, SLIDER_Y, SLIDER_X + SLIDER_WIDTH, SLIDER_Y + SLIDER_HEIGHT,
                         new Color(60, 60, 60).getRGB());
 
                 // Draw slider
                 double percent = (setting.getValue() - setting.getMinimum()) /
                         (setting.getMaximum() - setting.getMinimum());
                 int sliderPos = (int)(SLIDER_X + (SLIDER_WIDTH * percent));
-                Gui.drawRect(SLIDER_X, SLIDER_Y - 2, sliderPos, SLIDER_Y + 2,
+                Gui.drawRect(SLIDER_X, SLIDER_Y, sliderPos, SLIDER_Y + SLIDER_HEIGHT,
                         new Color(180, 180, 255).getRGB());
 
                 // Handle dragging
@@ -631,6 +615,74 @@ public class ClickGUI extends Module {
                                         (moduleExpandStates.get(m) ?
                                                 m.getSettings().size() * SETTING_HEIGHT : 0))
                                 .sum()) : 0);
+            }
+        }
+
+        @Override
+        protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+            super.mouseClickMove(mouseX, mouseY, clickedMouseButton, timeSinceLastClick);
+
+            if (clickedMouseButton == 0) {
+                for (CategoryPanel panel : categoryPanels.values()) {
+                    int currentY = panel.y + HEADER_HEIGHT - panel.scrollOffset;
+
+                    for (Module module : panel.modules) {
+                        currentY += MODULE_HEIGHT;
+
+                        if (panel.moduleExpandStates.get(module)) {
+                            for (Setting setting : module.getSettings()) {
+                                if (!setting.isVisible()) continue;
+
+                                if (setting instanceof ColorSetting) {
+                                    ColorSetting colorSetting = (ColorSetting) setting;
+                                    if (colorSetting.isExpanded()) {
+                                        final int COLOR_PICKER_SIZE = 80;
+                                        final int HUE_HEIGHT = 8;
+                                        final int ALPHA_HEIGHT = 8;
+
+                                        int pickerY = currentY + SETTING_HEIGHT;
+                                        int pickerX = panel.x + PADDING;
+
+                                        // Update color based on mouse drag
+                                        if (mouseY >= pickerY + PADDING &&
+                                                mouseY <= pickerY + PADDING + COLOR_PICKER_SIZE &&
+                                                mouseX >= pickerX &&
+                                                mouseX <= pickerX + COLOR_PICKER_SIZE) {
+                                            float saturation = (mouseX - pickerX) / (float)COLOR_PICKER_SIZE;
+                                            float brightness = 1f - (mouseY - (pickerY + PADDING)) / (float)COLOR_PICKER_SIZE;
+                                            float[] hsb = colorSetting.getHSB();
+                                            colorSetting.setHSB(hsb[0],
+                                                    Math.max(0f, Math.min(1f, saturation)),
+                                                    Math.max(0f, Math.min(1f, brightness)));
+                                        }
+
+                                        // Update hue based on mouse drag
+                                        int hueY = pickerY + PADDING + COLOR_PICKER_SIZE + PADDING;
+                                        if (mouseY >= hueY && mouseY <= hueY + HUE_HEIGHT &&
+                                                mouseX >= pickerX && mouseX <= pickerX + COLOR_PICKER_SIZE) {
+                                            float hue = (mouseX - pickerX) / (float)COLOR_PICKER_SIZE;
+                                            colorSetting.setHue(Math.max(0f, Math.min(1f, hue)));
+                                        }
+
+                                        // Update alpha based on mouse drag
+                                        int alphaY = hueY + HUE_HEIGHT + PADDING;
+                                        if (mouseY >= alphaY && mouseY <= alphaY + ALPHA_HEIGHT &&
+                                                mouseX >= pickerX && mouseX <= pickerX + COLOR_PICKER_SIZE) {
+                                            float alpha = (mouseX - pickerX) / (float)COLOR_PICKER_SIZE;
+                                            colorSetting.setAlpha(Math.max(0f, Math.min(1f, alpha)));
+                                        }
+                                    }
+                                }
+
+                                int settingHeight = SETTING_HEIGHT;
+                                if (setting instanceof ColorSetting && ((ColorSetting) setting).isExpanded()) {
+                                    settingHeight += 80 + 8 + 8 + PADDING * 3;
+                                }
+                                currentY += settingHeight;
+                            }
+                        }
+                    }
+                }
             }
         }
 
