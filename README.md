@@ -1,6 +1,6 @@
 # Solace
 
-### wip by [huys](github.com/huysuh)
+### wip by [huys](https://github.com/huysuh)
 
 ![GitHub last commit](https://img.shields.io/github/last-commit/solaceclient/solace)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/t/solaceclient/Solace)
