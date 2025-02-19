@@ -39,6 +39,21 @@ public class Category implements Serializable {
         }
     }
 
+    private static final List<Category> ALL_CATEGORIES = new ArrayList<>();
+
+    static {
+        ALL_CATEGORIES.add(COMBAT);
+        ALL_CATEGORIES.add(MOVEMENT);
+        ALL_CATEGORIES.add(PLAYER);
+        ALL_CATEGORIES.add(RENDER);
+        ALL_CATEGORIES.add(WORLD);
+        ALL_CATEGORIES.add(SCREEN);
+    }
+
+    public static Category[] values() {
+        return ALL_CATEGORIES.toArray(new Category[0]);
+    }
+
     public String getName() {
         return name;
     }

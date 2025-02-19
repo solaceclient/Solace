@@ -2,6 +2,8 @@ package huysuh.Modules;
 
 import huysuh.Events.Event;
 import huysuh.Settings.Setting;
+import huysuh.Utils.Colors;
+import huysuh.Utils.Wrapper;
 import net.minecraft.client.Minecraft;
 
 import java.io.Serializable;
@@ -25,6 +27,7 @@ public class Module implements Serializable {
     private boolean enabled;
     private boolean expanded;
     private int keyCode;
+    private String tag = "";
 
     public Module(String name, Category category, int keyCode) {
         this(name, null, category, keyCode);
@@ -45,6 +48,22 @@ public class Module implements Serializable {
     protected void onHold() {}
     public void onEvent(Event e) {}
 
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public Float getLastYPosition() {
+        return lastYPosition;
+    }
+
+    public void setLastYPosition(Float lastYPosition) {
+        this.lastYPosition = lastYPosition;
+    }
+
     // Toggle logic
     public void toggle() {
         setEnabled(!enabled);
@@ -53,6 +72,14 @@ public class Module implements Serializable {
         } else {
             onDisable();
         }
+    }
+
+    public static List<Setting> getAllSettings() {
+        List<Setting> allSettings = new ArrayList<>();
+        for (Module module : modules) {
+            allSettings.addAll(module.getSettings());
+        }
+        return allSettings;
     }
 
     // Static module management
@@ -138,6 +165,23 @@ public class Module implements Serializable {
     }
 
     public String getName() {
+        return this.name;
+    }
+
+    public String getFullName(String type) {
+        if (this.getTag().isEmpty()){
+            return this.name;
+        }
+        switch (type){
+            case "BRACKETS":
+                return Colors.color(this.name + "&7 [" + this.getTag() + "&7]");
+            case "PARENTHESIS":
+                return Colors.color(this.name + "&7 (" + this.getTag() + "&7)");
+            case "DASH":
+                return Colors.color(this.name + "&7 - " + this.getTag());
+            case "SPACE":
+                return Colors.color(this.name + "&7 " + this.getTag());
+        }
         return this.name;
     }
 
