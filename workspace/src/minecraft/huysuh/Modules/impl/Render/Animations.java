@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class Animations extends Module {
 
-    public ModeSetting animation = new ModeSetting("Animations", "1.7", "1.8", "Virtue", "Slash", "Tap", "Spin",
+    public ModeSetting animation = new ModeSetting("Animations", "Virtue", "1.8", "1.7", "Slash", "Tap", "Spin",
             "Swong", "Push", "Stab", "Swank", "Exhibition", "Summer", "Autumn", "Winter", "Spring",
             "Punch", "Zoom", "Swing", "Slide", "Wave");
 
@@ -38,4 +38,13 @@ public class Animations extends Module {
         this.addSettings(animation);
     }
 
+    @Override
+    public void onEvent(Event e) {
+        if (e instanceof EventRender2D){
+            if (!this.isEnabled()){
+                return;
+            }
+            this.setTag(animation.getMode());
+        }
+    }
 }

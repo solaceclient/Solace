@@ -3,10 +3,12 @@ package huysuh;
 import huysuh.Events.Event;
 import huysuh.Modules.Module;
 import huysuh.Modules.impl.Combat.KillAura;
-import huysuh.Modules.impl.Render.Animations;
-import huysuh.Modules.impl.Render.Camera;
-import huysuh.Modules.impl.Render.ClickGUI;
-import huysuh.Modules.impl.Render.HUD;
+import huysuh.Modules.impl.Combat.Velocity;
+import huysuh.Modules.impl.Movement.KeepSprint;
+import huysuh.Modules.impl.Movement.NoSlow;
+import huysuh.Modules.impl.Movement.Speed;
+import huysuh.Modules.impl.Movement.Sprint;
+import huysuh.Modules.impl.Render.*;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.Display;
 
@@ -26,7 +28,13 @@ public class Solace {
             new ClickGUI(),
             new KillAura(),
             new Animations(),
-            new Camera()
+            new Camera(),
+            new Sprint(),
+            new NoSlow(),
+            new KeepSprint(),
+            new Speed(),
+            new TargetHUD(),
+            new Velocity()
     ));
 
     private static final List<Event> tickEvents = new ArrayList<>(Collections.emptyList());
@@ -41,6 +49,9 @@ public class Solace {
         modules.forEach(module -> {
             Module.registerModule(module);
             System.out.println("Registered module: " + module.getName() + " in category: " + module.getCategory().getName());
+            if (module instanceof HUD || module instanceof Sprint || module instanceof Animations){
+                module.setEnabled(true);
+            }
         });
 
         System.out.println("Total registered modules: " + Module.getModules().size());

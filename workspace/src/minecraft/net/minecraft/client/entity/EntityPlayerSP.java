@@ -2,6 +2,7 @@ package net.minecraft.client.entity;
 
 import huysuh.Events.Event;
 import huysuh.Events.impl.EventMotion;
+import huysuh.Events.impl.EventSlowdown;
 import huysuh.Modules.Module;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.MovingSoundMinecartRiding;
@@ -794,9 +795,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
         if (this.isUsingItem() && !this.isRiding())
         {
-            this.movementInput.moveStrafe *= 0.2F;
-            this.movementInput.moveForward *= 0.2F;
-            this.sprintToggleTimer = 0;
+            if (!(new EventSlowdown(EventSlowdown.SlowdownType.MOTION).fire().isCancelled())){
+                this.movementInput.moveStrafe *= 0.2F;
+                this.movementInput.moveForward *= 0.2F;
+                this.sprintToggleTimer = 0;
+            }
         }
 
         this.pushOutOfBlocks(this.posX - (double)this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double)this.width * 0.35D);

@@ -10,12 +10,6 @@ public class Colors {
     }
     public static String uncolor(String input) {return input.replaceAll("(§|&)[0-9A-FK-ORa-fk-or]", "");}
 
-    public static int getRainbow(float seconds, float saturation, float brightness) {
-        float hue = (System.currentTimeMillis() % (int)(seconds * 1000)) / (float)(seconds * 1000);
-        int color = Color.HSBtoRGB(hue, saturation, brightness);
-        return color;
-    }
-
     public static int blendColors(int color1, int color2, double t) {
         t = Math.max(0, Math.min(1, t));
 

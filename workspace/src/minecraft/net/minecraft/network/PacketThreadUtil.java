@@ -1,5 +1,7 @@
 package net.minecraft.network;
 
+import huysuh.Events.impl.EventPacketReceive;
+import huysuh.Events.impl.Packets.CustomPacket;
 import net.minecraft.network.play.server.S01PacketJoinGame;
 import net.minecraft.network.play.server.S07PacketRespawn;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
@@ -19,6 +21,11 @@ public class PacketThreadUtil
                 public void run()
                 {
                     PacketThreadUtil.clientPreProcessPacket(p_180031_0_);
+
+                    CustomPacket customPacket = new CustomPacket(p_180031_0_, CustomPacket.PacketStatus.PRE);
+
+                    if (new EventPacketReceive(customPacket).fire().isCancelled()){ return; }
+
                     p_180031_0_.processPacket(p_180031_1_);
                 }
             });

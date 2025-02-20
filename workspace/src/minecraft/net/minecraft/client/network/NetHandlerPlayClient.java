@@ -4,6 +4,8 @@ import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.mojang.authlib.GameProfile;
+import huysuh.Events.impl.EventPacketSend;
+import huysuh.Events.impl.Packets.CustomPacket;
 import io.netty.buffer.Unpooled;
 import java.io.File;
 import java.io.IOException;
@@ -813,6 +815,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
 
     public void addToSendQueue(Packet p_147297_1_)
     {
+        if (new EventPacketSend(new CustomPacket(p_147297_1_, CustomPacket.PacketStatus.POST)).fire().isCancelled()){ return; }
         this.netManager.sendPacket(p_147297_1_);
     }
 

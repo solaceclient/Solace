@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
+
+import huysuh.Events.impl.EventRender3D;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.material.Material;
@@ -1895,6 +1897,11 @@ public class EntityRenderer implements IResourceManagerReloadListener
             this.mc.mcProfiler.endStartSection("forge_render_last");
             Reflector.callVoid(Reflector.ForgeHooksClient_dispatchRenderLast, new Object[] {renderglobal, Float.valueOf(partialTicks)});
         }
+
+        GlStateManager.pushMatrix();
+        EventRender3D eventRender3D = new EventRender3D(partialTicks);
+        eventRender3D.fire();
+        GlStateManager.popMatrix();
 
         this.mc.mcProfiler.endStartSection("hand");
 

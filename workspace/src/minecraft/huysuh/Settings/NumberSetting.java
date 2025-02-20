@@ -22,6 +22,18 @@ public class NumberSetting extends Setting {
         return this.value;
     }
 
+    public int getValueInt() {
+        return (int) this.value;
+    }
+
+    public float getValueFloat() {
+        return (float) this.value;
+    }
+
+    public long getValueLong() {
+        return (long) this.value;
+    }
+
     public void setValue(double value) {
         if (increment == 0.1){
             this.value = Math.max(this.minimum, Math.min(this.maximum, Math.round(value * 10.0) / 10.0));
