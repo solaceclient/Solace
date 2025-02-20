@@ -1,39 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="solace:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6aa848a-7a52-4752-89df-ccd64250f6ae" name="Default Changelist" comment="">
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Events/impl/EventPacketReceive.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Events/impl/EventPacketSend.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Events/impl/EventRender3D.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Events/impl/EventSlowdown.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Events/impl/Packets/CustomPacket.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Combat/Velocity.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/KeepSprint.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/NoSlow.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/Speed.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/Sprint.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/TargetHUD.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/RainbowUtil.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/Render/GLUtil.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/Render/Render.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/RenderUtil.java" afterDir="false" />
+    <list default="true" id="d6aa848a-7a52-4752-89df-ccd64250f6ae" name="Default Changelist" comment="some new hud stuff">
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/solace_jar.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Combat/KillAura.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Combat/KillAura.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/Animations.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/Animations.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/HUD.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/HUD.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Settings/NumberSetting.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Settings/NumberSetting.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Utils/Colors.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/Colors.java" afterDir="false" />
       <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/entity/EntityPlayerSP.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/entity/EntityPlayerSP.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/network/NetHandlerPlayClient.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/network/NetHandlerPlayClient.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/EntityRenderer.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/EntityRenderer.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/entity/RenderManager.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/entity/RenderManager.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/entity/RendererLivingEntity.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/entity/RendererLivingEntity.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/entity/EntityLivingBase.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/entity/EntityLivingBase.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/entity/player/EntityPlayer.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/entity/player/EntityPlayer.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/network/PacketThreadUtil.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/network/PacketThreadUtil.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/network/play/server/S12PacketEntityVelocity.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/network/play/server/S12PacketEntityVelocity.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiMainMenu.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiMainMenu.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,8 +45,9 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$MCP_LOC$/src/minecraft/huysuh/Utils/Render" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
@@ -104,6 +83,14 @@
       <option name="presentableId" value="Default" />
       <updated>1738803491131</updated>
     </task>
+    <task id="LOCAL-00001" summary="some new hud stuff">
+      <created>1740027523692</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1740027523692</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -117,5 +104,9 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="some new hud stuff" />
+    <option name="LAST_COMMIT_MESSAGE" value="some new hud stuff" />
   </component>
 </project>

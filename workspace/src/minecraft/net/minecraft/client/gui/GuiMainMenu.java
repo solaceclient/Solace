@@ -1,727 +1,295 @@
 package net.minecraft.client.gui;
 
-import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import java.io.BufferedReader;
+import huysuh.Font.Fonts;
+import huysuh.UI.GuiAlts;
+import huysuh.Utils.RainbowUtil;
+
+import java.awt.*;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.realms.RealmsBridge;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.demo.DemoWorldServer;
-import net.minecraft.world.storage.ISaveFormat;
-import net.minecraft.world.storage.WorldInfo;
-import net.optifine.CustomPanorama;
-import net.optifine.CustomPanoramaProperties;
-import net.optifine.reflect.Reflector;
-import org.apache.commons.io.Charsets;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.glu.Project;
 
-public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
-{
-    private static final AtomicInteger field_175373_f = new AtomicInteger(0);
-    private static final Logger logger = LogManager.getLogger();
-    private static final Random RANDOM = new Random();
+public class GuiMainMenu extends GuiScreen {
+    // Animation variables
+    private float animationTime = 0;
+    private RainbowUtil rainbowUtil = new RainbowUtil(3.0f, 0.7f, 1.0f);
 
-    /** Counts the number of screen updates. */
-    private float updateCounter;
+    // Button positions
+    private int buttonWidth = 120;
+    private int buttonHeight = 20;
+    private int buttonSpacing = 4;
+    private int baseButtonY;
 
-    /** The splash message. */
-    private String splashText;
-    private GuiButton buttonResetDemo;
+    // Color constants
+    private static final int BLACK = 0xFF000000;
+    private static final int DARK_GRAY = 0xFF101010;
+    private static final int GREEN = new Color(124, 194, 91).getRGB();
+    private static final int DARK_GREEN = new Color(60, 92, 44).getRGB();
+    private static final int TEXT_GREEN = new Color(124, 194, 91).getRGB();
 
-    /** Timer used to rotate the panorama, increases every tick. */
-    private int panoramaTimer;
+    // Grid settings
+    private float gridSize = 25;
+    private float scrollSpeed = 0.1f;
+    private float gridAlpha = 0.07f;
 
-    /**
-     * Texture allocated for the current viewport of the main menu's panorama background.
-     */
-    private DynamicTexture viewportTexture;
-    private boolean field_175375_v = true;
+    @Override
+    public void initGui() {
+        baseButtonY = this.height / 2 - 20;
+        this.buttonList.clear();
+        this.addMainButtons();
+    }
 
-    /**
-     * The Object object utilized as a thread lock when performing non thread-safe operations
-     */
-    private final Object threadLock = new Object();
+    private void addMainButtons() {
+        int yPos = baseButtonY;
 
-    /** OpenGL graphics card warning. */
-    private String openGLWarning1;
+        // Main menu buttons
+        this.buttonList.add(new ModernButton(1, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, I18n.format("menu.singleplayer")));
+        yPos += buttonHeight + buttonSpacing;
 
-    /** OpenGL graphics card warning. */
-    private String openGLWarning2;
+        this.buttonList.add(new ModernButton(2, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, I18n.format("menu.multiplayer")));
+        yPos += buttonHeight + buttonSpacing;
 
-    /** Link to the Mojang Support about minimum requirements */
-    private String openGLWarningLink;
-    private static final ResourceLocation splashTexts = new ResourceLocation("texts/splashes.txt");
-    private static final ResourceLocation minecraftTitleTextures = new ResourceLocation("textures/gui/title/minecraft.png");
+        this.buttonList.add(new ModernButton(0, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, I18n.format("menu.options")));
+        yPos += buttonHeight + buttonSpacing;
 
-    /** An array of all the paths to the panorama pictures. */
-    private static final ResourceLocation[] titlePanoramaPaths = new ResourceLocation[] {new ResourceLocation("textures/gui/title/background/panorama_0.png"), new ResourceLocation("textures/gui/title/background/panorama_1.png"), new ResourceLocation("textures/gui/title/background/panorama_2.png"), new ResourceLocation("textures/gui/title/background/panorama_3.png"), new ResourceLocation("textures/gui/title/background/panorama_4.png"), new ResourceLocation("textures/gui/title/background/panorama_5.png")};
-    public static final String field_96138_a = "Please click " + EnumChatFormatting.UNDERLINE + "here" + EnumChatFormatting.RESET + " for more information.";
-    private int field_92024_r;
-    private int field_92023_s;
-    private int field_92022_t;
-    private int field_92021_u;
-    private int field_92020_v;
-    private int field_92019_w;
-    private ResourceLocation backgroundTexture;
+        this.buttonList.add(new ModernButton(4, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, "Alt Manager"));
+    }
 
-    /** Minecraft Realms button. */
-    private GuiButton realmsButton;
-    private boolean L;
-    private GuiScreen M;
-    private GuiButton modButton;
-    private GuiScreen modUpdateNotification;
+    @Override
+    public void updateScreen() {
+        animationTime += 0.01F;
+        rainbowUtil.update();
 
-    public GuiMainMenu()
-    {
-        this.openGLWarning2 = field_96138_a;
-        this.L = false;
-        this.splashText = "missingno";
-        BufferedReader bufferedreader = null;
-
-        try
-        {
-            List<String> list = Lists.<String>newArrayList();
-            bufferedreader = new BufferedReader(new InputStreamReader(Minecraft.getMinecraft().getResourceManager().getResource(splashTexts).getInputStream(), Charsets.UTF_8));
-            String s;
-
-            while ((s = bufferedreader.readLine()) != null)
-            {
-                s = s.trim();
-
-                if (!s.isEmpty())
-                {
-                    list.add(s);
-                }
-            }
-
-            if (!list.isEmpty())
-            {
-                while (true)
-                {
-                    this.splashText = (String)list.get(RANDOM.nextInt(list.size()));
-
-                    if (this.splashText.hashCode() != 125780783)
-                    {
-                        break;
-                    }
-                }
+        // Update each button's rainbow effect
+        for (GuiButton button : this.buttonList) {
+            if (button instanceof ModernButton) {
+                ((ModernButton) button).updateRainbow();
             }
         }
-        catch (IOException var12)
-        {
-            ;
-        }
-        finally
-        {
-            if (bufferedreader != null)
-            {
-                try
-                {
-                    bufferedreader.close();
-                }
-                catch (IOException var11)
-                {
-                    ;
-                }
-            }
-        }
-
-        this.updateCounter = RANDOM.nextFloat();
-        this.openGLWarning1 = "";
-
-        if (!GLContext.getCapabilities().OpenGL20 && !OpenGlHelper.areShadersSupported())
-        {
-            this.openGLWarning1 = I18n.format("title.oldgl1", new Object[0]);
-            this.openGLWarning2 = I18n.format("title.oldgl2", new Object[0]);
-            this.openGLWarningLink = "https://help.mojang.com/customer/portal/articles/325948?ref=game";
-        }
     }
 
-    private boolean a()
-    {
-        return Minecraft.getMinecraft().gameSettings.getOptionOrdinalValue(GameSettings.Options.enumFloat) && this.M != null;
-    }
-
-    /**
-     * Called from the main game loop to update the screen.
-     */
-    public void updateScreen()
-    {
-        ++this.panoramaTimer;
-
-        if (this.a())
-        {
-            this.M.updateScreen();
-        }
-    }
-
-    /**
-     * Returns true if this GUI should pause the game when it is displayed in single-player
-     */
-    public boolean doesGuiPauseGame()
-    {
-        return false;
-    }
-
-    /**
-     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
-     * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
-     */
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
-    {
-    }
-
-    /**
-     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
-     * window resizes, the buttonList is cleared beforehand.
-     */
-    public void initGui()
-    {
-        this.viewportTexture = new DynamicTexture(256, 256);
-        this.backgroundTexture = this.mc.getTextureManager().getDynamicTextureLocation("background", this.viewportTexture);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-
-        if (calendar.get(2) + 1 == 12 && calendar.get(5) == 24)
-        {
-            this.splashText = "Merry X-mas!";
-        }
-        else if (calendar.get(2) + 1 == 1 && calendar.get(5) == 1)
-        {
-            this.splashText = "Happy new year!";
-        }
-        else if (calendar.get(2) + 1 == 10 && calendar.get(5) == 31)
-        {
-            this.splashText = "OOoooOOOoooo! Spooky!";
-        }
-
-        int i = 24;
-        int j = this.height / 4 + 48;
-
-        if (this.mc.isDemo())
-        {
-            this.addDemoButtons(j, 24);
-        }
-        else
-        {
-            this.addSingleplayerMultiplayerButtons(j, 24);
-        }
-
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 100, j + 72 + 12, 98, 20, I18n.format("menu.options", new Object[0])));
-        this.buttonList.add(new GuiButton(4, this.width / 2 + 2, j + 72 + 12, 98, 20, I18n.format("menu.quit", new Object[0])));
-        this.buttonList.add(new GuiButtonLanguage(5, this.width / 2 - 124, j + 72 + 12));
-
-        synchronized (this.threadLock)
-        {
-            this.field_92023_s = this.fontRendererObj.getStringWidth(this.openGLWarning1);
-            this.field_92024_r = this.fontRendererObj.getStringWidth(this.openGLWarning2);
-            int k = Math.max(this.field_92023_s, this.field_92024_r);
-            this.field_92022_t = (this.width - k) / 2;
-            this.field_92021_u = ((GuiButton)this.buttonList.get(0)).yPosition - 24;
-            this.field_92020_v = this.field_92022_t + k;
-            this.field_92019_w = this.field_92021_u + 24;
-        }
-
-        this.mc.setConnectedToRealms(false);
-
-        if (Minecraft.getMinecraft().gameSettings.getOptionOrdinalValue(GameSettings.Options.enumFloat) && !this.L)
-        {
-            RealmsBridge realmsbridge = new RealmsBridge();
-            this.M = realmsbridge.getNotificationScreen(this);
-            this.L = true;
-        }
-
-        if (this.a())
-        {
-            this.M.a(this.width, this.height);
-            this.M.initGui();
-        }
-    }
-
-    /**
-     * Adds Singleplayer and Multiplayer buttons on Main Menu for players who have bought the game.
-     */
-    private void addSingleplayerMultiplayerButtons(int p_73969_1_, int p_73969_2_)
-    {
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer", new Object[0])));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 1, I18n.format("menu.multiplayer", new Object[0])));
-
-        if (Reflector.GuiModList_Constructor.exists())
-        {
-            this.buttonList.add(this.realmsButton = new GuiButton(14, this.width / 2 + 2, p_73969_1_ + p_73969_2_ * 2, 98, 20, I18n.format("menu.online", new Object[0]).replace("Minecraft", "").trim()));
-            this.buttonList.add(this.modButton = new GuiButton(6, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, 98, 20, I18n.format("fml.menu.mods", new Object[0])));
-        }
-        else
-        {
-            this.buttonList.add(this.realmsButton = new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new Object[0])));
-        }
-    }
-
-    /**
-     * Adds Demo buttons on Main Menu for players who are playing Demo.
-     */
-    private void addDemoButtons(int p_73972_1_, int p_73972_2_)
-    {
-        this.buttonList.add(new GuiButton(11, this.width / 2 - 100, p_73972_1_, I18n.format("menu.playdemo", new Object[0])));
-        this.buttonList.add(this.buttonResetDemo = new GuiButton(12, this.width / 2 - 100, p_73972_1_ + p_73972_2_ * 1, I18n.format("menu.resetdemo", new Object[0])));
-        ISaveFormat isaveformat = this.mc.getSaveLoader();
-        WorldInfo worldinfo = isaveformat.getWorldInfo("Demo_World");
-
-        if (worldinfo == null)
-        {
-            this.buttonResetDemo.enabled = false;
-        }
-    }
-
-    /**
-     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
-     */
-    protected void actionPerformed(GuiButton button) throws IOException
-    {
-        if (button.id == 0)
-        {
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException {
+        if (button.id == 0) {
             this.mc.displayGuiScreen(new GuiOptions(this, this.mc.gameSettings));
         }
 
-        if (button.id == 5)
-        {
-            this.mc.displayGuiScreen(new GuiLanguage(this, this.mc.gameSettings, this.mc.getLanguageManager()));
-        }
-
-        if (button.id == 1)
-        {
+        if (button.id == 1) {
             this.mc.displayGuiScreen(new GuiSelectWorld(this));
         }
 
-        if (button.id == 2)
-        {
+        if (button.id == 2) {
             this.mc.displayGuiScreen(new GuiMultiplayer(this));
         }
 
-        if (button.id == 14 && this.realmsButton.visible)
-        {
-            this.f();
-        }
-
-        if (button.id == 4)
-        {
-            this.mc.shutdown();
-        }
-
-        if (button.id == 6 && Reflector.GuiModList_Constructor.exists())
-        {
-            this.mc.displayGuiScreen((GuiScreen)Reflector.newInstance(Reflector.GuiModList_Constructor, new Object[] {this}));
-        }
-
-        if (button.id == 11)
-        {
-            this.mc.launchIntegratedServer("Demo_World", "Demo_World", DemoWorldServer.demoWorldSettings);
-        }
-
-        if (button.id == 12)
-        {
-            ISaveFormat isaveformat = this.mc.getSaveLoader();
-            WorldInfo worldinfo = isaveformat.getWorldInfo("Demo_World");
-
-            if (worldinfo != null)
-            {
-                GuiYesNo guiyesno = GuiSelectWorld.makeDeleteWorldYesNo(this, worldinfo.getWorldName(), 12);
-                this.mc.displayGuiScreen(guiyesno);
-            }
+        if (button.id == 4) {
+            this.mc.displayGuiScreen(new GuiAlts(this));
         }
     }
 
-    private void f()
-    {
-        RealmsBridge realmsbridge = new RealmsBridge();
-        realmsbridge.switchToRealms(this);
-    }
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        // Base background
+        drawRect(0, 0, this.width, this.height, BLACK);
 
-    public void confirmClicked(boolean result, int id)
-    {
-        if (result && id == 12)
-        {
-            ISaveFormat isaveformat = this.mc.getSaveLoader();
-            isaveformat.flushCache();
-            isaveformat.deleteWorldDirectory("Demo_World");
-            this.mc.displayGuiScreen(this);
-        }
-        else if (id == 13)
-        {
-            if (result)
-            {
-                try
-                {
-                    Class<?> oclass = Class.forName("java.awt.Desktop");
-                    Object object = oclass.getMethod("getDesktop", new Class[0]).invoke((Object)null, new Object[0]);
-                    oclass.getMethod("browse", new Class[] {URI.class}).invoke(object, new Object[] {new URI(this.openGLWarningLink)});
-                }
-                catch (Throwable throwable)
-                {
-                    logger.error("Couldn\'t open link", throwable);
-                }
-            }
+        // Ambient background
+        drawAnimatedBackground(partialTicks);
 
-            this.mc.displayGuiScreen(this);
-        }
-    }
+        // Version and credits
+        drawVersionInfo();
 
-    /**
-     * Draws the main menu panorama
-     */
-    private void drawPanorama(int p_73970_1_, int p_73970_2_, float p_73970_3_)
-    {
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        GlStateManager.matrixMode(5889);
-        GlStateManager.pushMatrix();
-        GlStateManager.loadIdentity();
-        Project.gluPerspective(120.0F, 1.0F, 0.05F, 10.0F);
-        GlStateManager.matrixMode(5888);
-        GlStateManager.pushMatrix();
-        GlStateManager.loadIdentity();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(90.0F, 0.0F, 0.0F, 1.0F);
-        GlStateManager.enableBlend();
-        GlStateManager.disableAlpha();
-        GlStateManager.disableCull();
-        GlStateManager.depthMask(false);
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        int i = 8;
-        int j = 64;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
-
-        if (custompanoramaproperties != null)
-        {
-            j = custompanoramaproperties.getBlur1();
-        }
-
-        for (int k = 0; k < j; ++k)
-        {
-            GlStateManager.pushMatrix();
-            float f = ((float)(k % i) / (float)i - 0.5F) / 64.0F;
-            float f1 = ((float)(k / i) / (float)i - 0.5F) / 64.0F;
-            float f2 = 0.0F;
-            GlStateManager.translate(f, f1, f2);
-            GlStateManager.rotate(MathHelper.sin(((float)this.panoramaTimer + p_73970_3_) / 400.0F) * 25.0F + 20.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.rotate(-((float)this.panoramaTimer + p_73970_3_) * 0.1F, 0.0F, 1.0F, 0.0F);
-
-            for (int l = 0; l < 6; ++l)
-            {
-                GlStateManager.pushMatrix();
-
-                if (l == 1)
-                {
-                    GlStateManager.rotate(90.0F, 0.0F, 1.0F, 0.0F);
-                }
-
-                if (l == 2)
-                {
-                    GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-                }
-
-                if (l == 3)
-                {
-                    GlStateManager.rotate(-90.0F, 0.0F, 1.0F, 0.0F);
-                }
-
-                if (l == 4)
-                {
-                    GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-                }
-
-                if (l == 5)
-                {
-                    GlStateManager.rotate(-90.0F, 1.0F, 0.0F, 0.0F);
-                }
-
-                ResourceLocation[] aresourcelocation = titlePanoramaPaths;
-
-                if (custompanoramaproperties != null)
-                {
-                    aresourcelocation = custompanoramaproperties.getPanoramaLocations();
-                }
-
-                this.mc.getTextureManager().bindTexture(aresourcelocation[l]);
-                worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-                int i1 = 255 / (k + 1);
-                float f3 = 0.0F;
-                worldrenderer.pos(-1.0D, -1.0D, 1.0D).tex(0.0D, 0.0D).color(255, 255, 255, i1).endVertex();
-                worldrenderer.pos(1.0D, -1.0D, 1.0D).tex(1.0D, 0.0D).color(255, 255, 255, i1).endVertex();
-                worldrenderer.pos(1.0D, 1.0D, 1.0D).tex(1.0D, 1.0D).color(255, 255, 255, i1).endVertex();
-                worldrenderer.pos(-1.0D, 1.0D, 1.0D).tex(0.0D, 1.0D).color(255, 255, 255, i1).endVertex();
-                tessellator.draw();
-                GlStateManager.popMatrix();
-            }
-
-            GlStateManager.popMatrix();
-            GlStateManager.colorMask(true, true, true, false);
-        }
-
-        worldrenderer.setTranslation(0.0D, 0.0D, 0.0D);
-        GlStateManager.colorMask(true, true, true, true);
-        GlStateManager.matrixMode(5889);
-        GlStateManager.popMatrix();
-        GlStateManager.matrixMode(5888);
-        GlStateManager.popMatrix();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableCull();
-        GlStateManager.enableDepth();
-    }
-
-    /**
-     * Rotate and blurs the skybox view in the main menu
-     */
-    private void rotateAndBlurSkybox(float p_73968_1_)
-    {
-        this.mc.getTextureManager().bindTexture(this.backgroundTexture);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        GL11.glCopyTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, 0, 0, 256, 256);
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
-        GlStateManager.colorMask(true, true, true, false);
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        GlStateManager.disableAlpha();
-        int i = 3;
-        int j = 3;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
-
-        if (custompanoramaproperties != null)
-        {
-            j = custompanoramaproperties.getBlur2();
-        }
-
-        for (int k = 0; k < j; ++k)
-        {
-            float f = 1.0F / (float)(k + 1);
-            int l = this.width;
-            int i1 = this.height;
-            float f1 = (float)(k - i / 2) / 256.0F;
-            worldrenderer.pos((double)l, (double)i1, (double)this.zLevel).tex((double)(0.0F + f1), 1.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-            worldrenderer.pos((double)l, 0.0D, (double)this.zLevel).tex((double)(1.0F + f1), 1.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-            worldrenderer.pos(0.0D, 0.0D, (double)this.zLevel).tex((double)(1.0F + f1), 0.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-            worldrenderer.pos(0.0D, (double)i1, (double)this.zLevel).tex((double)(0.0F + f1), 0.0D).color(1.0F, 1.0F, 1.0F, f).endVertex();
-        }
-
-        tessellator.draw();
-        GlStateManager.enableAlpha();
-        GlStateManager.colorMask(true, true, true, true);
-    }
-
-    /**
-     * Renders the skybox in the main menu
-     */
-    private void renderSkybox(int p_73971_1_, int p_73971_2_, float p_73971_3_)
-    {
-        this.mc.getFramebuffer().unbindFramebuffer();
-        GlStateManager.viewport(0, 0, 256, 256);
-        this.drawPanorama(p_73971_1_, p_73971_2_, p_73971_3_);
-        this.rotateAndBlurSkybox(p_73971_3_);
-        int i = 3;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
-
-        if (custompanoramaproperties != null)
-        {
-            i = custompanoramaproperties.getBlur3();
-        }
-
-        for (int j = 0; j < i; ++j)
-        {
-            this.rotateAndBlurSkybox(p_73971_3_);
-            this.rotateAndBlurSkybox(p_73971_3_);
-        }
-
-        this.mc.getFramebuffer().bindFramebuffer(true);
-        GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);
-        float f2 = this.width > this.height ? 120.0F / (float)this.width : 120.0F / (float)this.height;
-        float f = (float)this.height * f2 / 256.0F;
-        float f1 = (float)this.width * f2 / 256.0F;
-        int k = this.width;
-        int l = this.height;
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        worldrenderer.pos(0.0D, (double)l, (double)this.zLevel).tex((double)(0.5F - f), (double)(0.5F + f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        worldrenderer.pos((double)k, (double)l, (double)this.zLevel).tex((double)(0.5F - f), (double)(0.5F - f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        worldrenderer.pos((double)k, 0.0D, (double)this.zLevel).tex((double)(0.5F + f), (double)(0.5F - f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        worldrenderer.pos(0.0D, 0.0D, (double)this.zLevel).tex((double)(0.5F + f), (double)(0.5F + f1)).color(1.0F, 1.0F, 1.0F, 1.0F).endVertex();
-        tessellator.draw();
-    }
-
-    /**
-     * Draws the screen and all the components in it. Args : mouseX, mouseY, renderPartialTicks
-     */
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
-        GlStateManager.disableAlpha();
-        this.renderSkybox(mouseX, mouseY, partialTicks);
-        GlStateManager.enableAlpha();
-        Tessellator tessellator = Tessellator.getInstance();
-        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
-        int i = 274;
-        int j = this.width / 2 - i / 2;
-        int k = 30;
-        int l = -2130706433;
-        int i1 = 16777215;
-        int j1 = 0;
-        int k1 = Integer.MIN_VALUE;
-        CustomPanoramaProperties custompanoramaproperties = CustomPanorama.getCustomPanoramaProperties();
-
-        if (custompanoramaproperties != null)
-        {
-            l = custompanoramaproperties.getOverlay1Top();
-            i1 = custompanoramaproperties.getOverlay1Bottom();
-            j1 = custompanoramaproperties.getOverlay2Top();
-            k1 = custompanoramaproperties.getOverlay2Bottom();
-        }
-
-        if (l != 0 || i1 != 0)
-        {
-            this.drawGradientRect(0, 0, this.width, this.height, l, i1);
-        }
-
-        if (j1 != 0 || k1 != 0)
-        {
-            this.drawGradientRect(0, 0, this.width, this.height, j1, k1);
-        }
-
-        this.mc.getTextureManager().bindTexture(minecraftTitleTextures);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-        if ((double)this.updateCounter < 1.0E-4D)
-        {
-            this.drawTexturedModalRect(j + 0, k + 0, 0, 0, 99, 44);
-            this.drawTexturedModalRect(j + 99, k + 0, 129, 0, 27, 44);
-            this.drawTexturedModalRect(j + 99 + 26, k + 0, 126, 0, 3, 44);
-            this.drawTexturedModalRect(j + 99 + 26 + 3, k + 0, 99, 0, 26, 44);
-            this.drawTexturedModalRect(j + 155, k + 0, 0, 45, 155, 44);
-        }
-        else
-        {
-            this.drawTexturedModalRect(j + 0, k + 0, 0, 0, 155, 44);
-            this.drawTexturedModalRect(j + 155, k + 0, 0, 45, 155, 44);
-        }
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float)(this.width / 2 + 90), 70.0F, 0.0F);
-        GlStateManager.rotate(-20.0F, 0.0F, 0.0F, 1.0F);
-        float f = 1.8F - MathHelper.abs(MathHelper.sin((float)(Minecraft.getSystemTime() % 1000L) / 1000.0F * (float)Math.PI * 2.0F) * 0.1F);
-        f = f * 100.0F / (float)(this.fontRendererObj.getStringWidth(this.splashText) + 32);
-        GlStateManager.scale(f, f, f);
-        this.drawCenteredString(this.fontRendererObj, this.splashText, 0, -8, -256);
-        GlStateManager.popMatrix();
-        String s = "Minecraft 1.8.9";
-
-        if (this.mc.isDemo())
-        {
-            s = s + " Demo";
-        }
-
-        if (Reflector.FMLCommonHandler_getBrandings.exists())
-        {
-            Object object = Reflector.call(Reflector.FMLCommonHandler_instance, new Object[0]);
-            List<String> list = Lists.<String>reverse((List)Reflector.call(object, Reflector.FMLCommonHandler_getBrandings, new Object[] {Boolean.valueOf(true)}));
-
-            for (int l1 = 0; l1 < list.size(); ++l1)
-            {
-                String s1 = (String)list.get(l1);
-
-                if (!Strings.isNullOrEmpty(s1))
-                {
-                    this.drawString(this.fontRendererObj, s1, 2, this.height - (10 + l1 * (this.fontRendererObj.FONT_HEIGHT + 1)), 16777215);
-                }
-            }
-
-            if (Reflector.ForgeHooksClient_renderMainMenu.exists())
-            {
-                Reflector.call(Reflector.ForgeHooksClient_renderMainMenu, new Object[] {this, this.fontRendererObj, Integer.valueOf(this.width), Integer.valueOf(this.height)});
-            }
-        }
-        else
-        {
-            this.drawString(this.fontRendererObj, s, 2, this.height - 10, -1);
-        }
-
-        String s2 = "Copyright Mojang AB. Do not distribute!";
-        this.drawString(this.fontRendererObj, s2, this.width - this.fontRendererObj.getStringWidth(s2) - 2, this.height - 10, -1);
-
-        if (this.openGLWarning1 != null && this.openGLWarning1.length() > 0)
-        {
-            drawRect(this.field_92022_t - 2, this.field_92021_u - 2, this.field_92020_v + 2, this.field_92019_w - 1, 1428160512);
-            this.drawString(this.fontRendererObj, this.openGLWarning1, this.field_92022_t, this.field_92021_u, -1);
-            this.drawString(this.fontRendererObj, this.openGLWarning2, (this.width - this.field_92024_r) / 2, ((GuiButton)this.buttonList.get(0)).yPosition - 12, -1);
-        }
-
+        // Draw buttons
         super.drawScreen(mouseX, mouseY, partialTicks);
+    }
 
-        if (this.a())
-        {
-            this.M.drawScreen(mouseX, mouseY, partialTicks);
+    private void drawAnimatedBackground(float partialTicks) {
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+
+        // Calculate grid offset based on animation time
+        float offset = (animationTime * scrollSpeed) % gridSize;
+
+        // Draw grid lines with fading effect
+        GlStateManager.color(0.0F, 0.5F, 0.1F, gridAlpha);
+
+        // Horizontal lines
+        worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+        for (float y = offset; y < this.height; y += gridSize) {
+            worldrenderer.pos(0, y, 0).endVertex();
+            worldrenderer.pos(this.width, y, 0).endVertex();
         }
+        tessellator.draw();
 
-        if (this.modUpdateNotification != null)
-        {
-            this.modUpdateNotification.drawScreen(mouseX, mouseY, partialTicks);
+        // Vertical lines
+        worldrenderer.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);
+        for (float x = offset; x < this.width; x += gridSize) {
+            worldrenderer.pos(x, 0, 0).endVertex();
+            worldrenderer.pos(x, this.height, 0).endVertex();
+        }
+        tessellator.draw();
+
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
+    private void drawRainbowLine(int startX, int endX, int y, int thickness) {
+        int segments = 20;
+        int segmentWidth = (endX - startX) / segments;
+
+        for (int i = 0; i < segments; i++) {
+            int x1 = startX + (i * segmentWidth);
+            int x2 = x1 + segmentWidth;
+
+            drawRect(x1, y, x2, y + thickness, rainbowUtil.getRainbow());
         }
     }
 
-    /**
-     * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
-     */
-    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
-    {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+    private float[] getColorComponents(int color) {
+        float r = ((color >> 16) & 0xFF) / 255.0f;
+        float g = ((color >> 8) & 0xFF) / 255.0f;
+        float b = (color & 0xFF) / 255.0f;
+        return new float[]{r, g, b};
+    }
 
-        synchronized (this.threadLock)
-        {
-            if (this.openGLWarning1.length() > 0 && mouseX >= this.field_92022_t && mouseX <= this.field_92020_v && mouseY >= this.field_92021_u && mouseY <= this.field_92019_w)
-            {
-                GuiConfirmOpenLink guiconfirmopenlink = new GuiConfirmOpenLink(this, this.openGLWarningLink, 13, true);
-                guiconfirmopenlink.disableSecurityWarning();
-                this.mc.displayGuiScreen(guiconfirmopenlink);
+    private void drawVersionInfo() {
+        // Version text in bottom left
+        String version = "1.8.9";
+        Fonts.SF.drawStringWithShadow(version, 5, this.height - 12, TEXT_GREEN);
+
+        // Credits text in bottom right
+        String credits = "by huys & heart";
+        Fonts.SF.drawStringWithShadow(credits,
+                this.width - Fonts.SF.getStringWidth(credits) - 5,
+                this.height - 12, TEXT_GREEN);
+    }
+
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    @Override
+    public boolean doesGuiPauseGame() {
+        return false;
+    }
+
+    // Modern button implementation with rainbow effect
+    public class ModernButton extends GuiButton {
+        private float hoverAnimation = 0;
+        private boolean wasHovered = false;
+        private float outlineAlpha = 0.0f;
+        private RainbowUtil buttonRainbow = new RainbowUtil(10.0f, 0.8f, 1.0f);
+        private float currentHue = 0f;
+
+        public ModernButton(int buttonId, int x, int y, int width, int height, String buttonText) {
+            super(buttonId, x, y, width, height, buttonText);
+            // Set different starting hues for each button to create a nice effect
+        }
+
+        public void updateRainbow() {
+            buttonRainbow.update();
+        }
+
+        @Override
+        public void drawButton(Minecraft mc, int mouseX, int mouseY) {
+            if (this.visible) {
+                this.hovered = mouseX >= this.xPosition && mouseY >= this.yPosition &&
+                        mouseX < this.xPosition + this.width && mouseY < this.yPosition + this.height;
+
+                // Smooth hover transition
+                if (this.hovered && !wasHovered) {
+                    outlineAlpha = 0.0f;
+                }
+
+                if (this.hovered) {
+                    hoverAnimation = Math.min(1.0F, hoverAnimation + 0.08F);
+                    outlineAlpha = Math.min(1.0F, outlineAlpha + 0.1F);
+                } else {
+                    hoverAnimation = Math.max(0.0F, hoverAnimation - 0.08F);
+                    outlineAlpha = Math.max(0.0F, outlineAlpha - 0.06F);
+                }
+
+                wasHovered = this.hovered;
+
+                // Draw button background
+                drawRect(this.xPosition, this.yPosition, this.xPosition + this.width,
+                        this.yPosition + this.height, DARK_GRAY);
+
+                // Rainbow outline when hovered
+                if (outlineAlpha > 0) {
+                    drawRainbowOutline(this.xPosition, this.yPosition, this.width, this.height, outlineAlpha);
+                }
+
+                // Calculate text color
+                int textColor = TEXT_GREEN;
+
+                // Center and draw text
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                Fonts.SF.drawCenteredStringWithShadow(this.displayString,
+                        this.xPosition + this.width / 2,
+                        this.yPosition + (this.height - 8) / 2, textColor);
             }
         }
 
-        if (this.a())
-        {
-            this.M.mouseClicked(mouseX, mouseY, mouseButton);
-        }
-    }
+        private void drawRainbowOutline(int x, int y, int width, int height, float alpha) {
+            GlStateManager.disableTexture2D();
+            GlStateManager.enableBlend();
+            GlStateManager.disableAlpha();
+            GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 
-    /**
-     * Called when the screen is unloaded. Used to disable keyboard repeat events
-     */
-    public void onGuiClosed()
-    {
-        if (this.M != null)
-        {
-            this.M.onGuiClosed();
+            int thickness = 1;
+            Color rainbow1 = new Color(buttonRainbow.getRainbow());
+            int segColor = new Color(rainbow1.getRed(), rainbow1.getGreen(), rainbow1.getBlue(),
+                    (int)(alpha * 255)).getRGB();
+
+            // Draw rainbow segments around the button
+            int segments = 8;
+            int segLength = width / (segments / 2);
+
+            // Top outline with segments
+            for (int i = 0; i < segments / 2; i++) {
+
+                int x1 = x + (i * segLength);
+                int x2 = Math.min(x + width, x1 + segLength);
+                drawRect(x1, y, x2, y + thickness, segColor);
+            }
+
+            // Right outline
+            for (int i = 0; i < segments / 4; i++) {
+
+                int y1 = y + (i * (height / (segments/4)));
+                int y2 = Math.min(y + height, y1 + (height / (segments/4)));
+                drawRect(x + width - thickness, y1, x + width, y2, segColor);
+            }
+
+            // Bottom outline with segments
+            for (int i = segments / 2 - 1; i >= 0; i--) {
+
+                int x1 = x + (i * segLength);
+                int x2 = Math.min(x + width, x1 + segLength);
+                drawRect(x1, y + height - thickness, x2, y + height, segColor);
+            }
+
+            // Left outline
+            for (int i = segments / 4 - 1; i >= 0; i--) {
+
+                int y1 = y + (i * (height / (segments/4)));
+                int y2 = Math.min(y + height, y1 + (height / (segments/4)));
+                drawRect(x, y1, x + thickness, y2, segColor);
+            }
+
+            GlStateManager.enableTexture2D();
+            GlStateManager.disableBlend();
+            GlStateManager.enableAlpha();
         }
     }
 }
