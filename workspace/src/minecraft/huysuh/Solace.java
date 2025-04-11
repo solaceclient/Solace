@@ -4,10 +4,7 @@ import huysuh.Events.Event;
 import huysuh.Modules.Module;
 import huysuh.Modules.impl.Combat.KillAura;
 import huysuh.Modules.impl.Combat.Velocity;
-import huysuh.Modules.impl.Movement.KeepSprint;
-import huysuh.Modules.impl.Movement.NoSlow;
-import huysuh.Modules.impl.Movement.Speed;
-import huysuh.Modules.impl.Movement.Sprint;
+import huysuh.Modules.impl.Movement.*;
 import huysuh.Modules.impl.Render.*;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.Display;
@@ -34,7 +31,8 @@ public class Solace {
             new KeepSprint(),
             new Speed(),
             new TargetHUD(),
-            new Velocity()
+            new Velocity(),
+            new Flight()
     ));
 
     private static final List<Event> tickEvents = new ArrayList<>(Collections.emptyList());

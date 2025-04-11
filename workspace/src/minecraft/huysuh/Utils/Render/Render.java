@@ -197,6 +197,90 @@ public class Render {
         }
 
     /**
+     *
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param borderWidth
+     * @param borderColor
+     * @param startColor
+     * @param endColor
+     * @param vertical
+     */
+    public static void drawBorderedGradientRect(int x, int y, int width, int height, int borderWidth, int borderColor, int startColor, int endColor, boolean vertical) {
+        // Draw the gradient background
+        drawGradientRect(x, y, width, height, startColor, endColor, vertical);
+
+        // Draw the border
+        // Top border
+        drawRect(x, y, width, borderWidth, borderColor);
+        // Bottom border
+        drawRect(x, y + height - borderWidth, width, borderWidth, borderColor);
+        // Left border
+        drawRect(x, y + borderWidth, borderWidth, height - (2 * borderWidth), borderColor);
+        // Right border
+        drawRect(x + width - borderWidth, y + borderWidth, borderWidth, height - (2 * borderWidth), borderColor);
+    }
+
+    /**
+     *
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param startColor
+     * @param endColor
+     * @param vertical
+     */
+    public static void drawGradientRect(float x, float y, float width, float height, int startColor, int endColor, boolean vertical) {
+        float f = (startColor >> 24 & 0xFF) / 255.0F;
+        float f1 = (startColor >> 16 & 0xFF) / 255.0F;
+        float f2 = (startColor >> 8 & 0xFF) / 255.0F;
+        float f3 = (startColor & 0xFF) / 255.0F;
+
+        float f4 = (endColor >> 24 & 0xFF) / 255.0F;
+        float f5 = (endColor >> 16 & 0xFF) / 255.0F;
+        float f6 = (endColor >> 8 & 0xFF) / 255.0F;
+        float f7 = (endColor & 0xFF) / 255.0F;
+
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.shadeModel(7425);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
+
+        if (vertical) {
+            // Gradient from top to bottom
+            worldrenderer.pos(x, y + height, 0.0D).color(f1, f2, f3, f).endVertex();
+            worldrenderer.pos(x + width, y + height, 0.0D).color(f1, f2, f3, f).endVertex();
+            worldrenderer.pos(x + width, y, 0.0D).color(f5, f6, f7, f4).endVertex();
+            worldrenderer.pos(x, y, 0.0D).color(f5, f6, f7, f4).endVertex();
+        } else {
+            // Gradient from left to right
+            worldrenderer.pos(x, y + height, 0.0D).color(f5, f6, f7, f4).endVertex();
+            worldrenderer.pos(x + width, y + height, 0.0D).color(f1, f2, f3, f).endVertex();
+            worldrenderer.pos(x + width, y, 0.0D).color(f1, f2, f3, f).endVertex();
+            worldrenderer.pos(x, y, 0.0D).color(f5, f6, f7, f4).endVertex();
+        }
+
+        tessellator.draw();
+        GlStateManager.shadeModel(7424);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+    }
+
+    // Convenience method that defaults to vertical gradient
+    public static void drawGradientRect(float x, float y, float width, float height, int startColor, int endColor) {
+        drawGradientRect(x, y, width, height, startColor, endColor, true);
+    }
+
+    /**
      * Get color based on percentage (green to red gradient)
      */
     public static int getColorFromPercentage(float percentage) {

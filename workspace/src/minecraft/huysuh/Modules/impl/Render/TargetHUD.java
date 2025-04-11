@@ -5,6 +5,7 @@ import huysuh.Events.impl.EventRender2D;
 import huysuh.Modules.Category;
 import huysuh.Modules.Module;
 import huysuh.Modules.impl.Combat.KillAura;
+import huysuh.Utils.Render.Render;
 import huysuh.Utils.RenderUtil;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.EntityLivingBase;
@@ -63,7 +64,7 @@ public class TargetHUD extends Module {
 
             float height = previousHeight;
 
-            RenderUtil.drawRect(x, y, x + width, y + height, new Color(20, 20, 20, 200).getRGB());
+            Render.drawBorderedRect((int)x, (int)y, (int)width, (int)height, 1, new Color(10, 10, 10, 40).getRGB(), new Color(20, 20, 20, 100).getRGB());
 
             // Interpolation for bars
             previousHealth = lerp(previousHealth, health, 0.005f);

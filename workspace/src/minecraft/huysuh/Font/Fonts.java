@@ -11,6 +11,8 @@ public abstract class Fonts {
 
     public static final CFontRenderer SF = new CFontRenderer(Fonts.getFonts("sf.ttf", 22), true, true);
     public static final CFontRenderer Arial = new CFontRenderer(Fonts.getFonts("ARIAL.ttf", 20), true, true);
+    public static final CFontRenderer Verdana = new CFontRenderer(Fonts.getFonts("Verdana.ttf", 19), true, true);
+    public static final CFontRenderer VerdanaBold = new CFontRenderer(Fonts.getFonts("Verdana-Bold.ttf", 19), false, true);
 
     private static Font getFonts(String fontName, int size) {
         Font font;

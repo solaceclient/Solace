@@ -141,13 +141,15 @@ public class Module implements Serializable {
     }
 
     public static List<Module> getModulesFromExactCategory(Category category) {
-        System.out.println("Searching for modules in category: " + category.getName());
+        //System.out.println("Searching for modules in category: " + category.getName());
         modules.forEach(module -> {
+            /*
             System.out.println("Comparing module: " + module.getName()
                     + " category: " + module.getCategory().getName()
                     + " (" + module.getCategory().hashCode() + ") with "
                     + category.getName() + " (" + category.hashCode() + ")"
                     + " equals: " + module.getCategory().equals(category));
+             */
         });
 
         return modules.stream()

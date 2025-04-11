@@ -20,6 +20,7 @@ public class Category implements Serializable {
     public static final Category PLAYER = new Category("Player", 0xFFffd77a);
     public static final Category RENDER = new Category("Render", 0xFFd17aff);
     public static final Category WORLD = new Category("World", 0xFF7ac4ff);
+    public static final Category CONFIG = new Category("Configuration", 0xFF7ac4ff);
 
     // Sub categories
     public static final Category SCREEN = new Category("Screen", 0xFFe17aff, RENDER);

@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 public class KillAura extends Module {
 
-    public NumberSetting range = new NumberSetting("Range", 3, 3, 8, 1);
+    public NumberSetting range = new NumberSetting("Range", 4.2, 3, 8, 1);
     public BooleanSetting hurtIgnore = new BooleanSetting("Hurt Ignore", false);
     public NumberSetting minCps = new NumberSetting("Min CPS", 12, 5, 20, 1);
     public NumberSetting maxCps = new NumberSetting("Max CPS", 14, 5, 20, 1);
@@ -75,7 +75,7 @@ public class KillAura extends Module {
                 .map(e -> (EntityLivingBase) e)
                 .filter(e -> !e.isDead && e.getHealth() > 0 && e.getMaxHealth() > 0)
                 .filter(e -> e.getDistanceToEntity(mc.thePlayer) <= range.getValue())
-                .filter(e -> !ignoreHurtTime || e.hurtTime == 0)
+                .filter(e -> !ignoreHurtTime || e.hurtTime < 5)
                 .filter(e -> e != mc.thePlayer)
                 .sorted(Comparator.comparingDouble(EntityLivingBase::getHealth))
                 .collect(Collectors.toList());

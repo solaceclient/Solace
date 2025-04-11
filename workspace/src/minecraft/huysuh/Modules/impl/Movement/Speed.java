@@ -5,6 +5,7 @@ import huysuh.Events.impl.EventMotion;
 import huysuh.Modules.Category;
 import huysuh.Modules.Module;
 import huysuh.Settings.ModeSetting;
+import huysuh.Utils.Movement.MovementUtil;
 import huysuh.Utils.Timer;
 import org.lwjgl.input.Keyboard;
 
@@ -24,17 +25,20 @@ public class Speed extends Module {
 
             this.setTag(mode.getMode());
 
-            if ((mc.thePlayer.moveStrafing == 0 && mc.thePlayer.moveForward == 0) || mc.thePlayer.isCollidedHorizontally){
+            if ((mc.thePlayer.moveStrafing == 0 && mc.thePlayer.moveForward == 0)){
                 return;
             }
 
             switch (mode.getMode()){
                 case "Motion":
-                    if (!mc.thePlayer.onGround){
-                        mc.thePlayer.motionY -= 555;
+                    if (mc.thePlayer.onGround){
+                        mc.thePlayer.jump();
+                    } else {
+                        if (mc.thePlayer.motionY < 0 && mc.thePlayer.motionY > -0.1){
+                            mc.thePlayer.motionY -= 0.25;
+                        }
                     }
-                    mc.thePlayer.motionX *= 1.25;
-                    mc.thePlayer.motionZ *= 1.25;
+                    MovementUtil.strafe(1.0f);
                     break;
             }
         }

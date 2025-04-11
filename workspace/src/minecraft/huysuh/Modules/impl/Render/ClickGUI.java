@@ -5,6 +5,7 @@ import huysuh.Font.Fonts;
 import huysuh.Modules.Category;
 import huysuh.Modules.Module;
 import huysuh.Settings.*;
+import huysuh.UI.ClickGUI.ClickGui;
 import huysuh.Utils.Wrapper;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.Gui;
@@ -19,12 +20,12 @@ import java.util.*;
 import java.util.List;
 
 public class ClickGUI extends Module {
-    private ClickGuiScreen guiScreen;
+    private ClickGui guiScreen;
     private static CFontRenderer fontRenderer = Fonts.SF;
 
     public ClickGUI() {
         super("ClickGUI", "Modern interface for managing modules", Category.RENDER, Keyboard.KEY_RSHIFT);
-        this.guiScreen = new ClickGuiScreen();
+        this.guiScreen = new ClickGui();
     }
 
     @Override

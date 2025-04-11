@@ -7,11 +7,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6aa848a-7a52-4752-89df-ccd64250f6ae" name="Default Changelist" comment="some new hud stuff">
-      <change afterPath="$PROJECT_DIR$/.idea/artifacts/solace_jar.xml" afterDir="false" />
+      <change afterPath="$MCP_LOC$/.idea/workspace.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/assets/minecraft/solace/fonts/Verdana-Bold.ttf" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/assets/minecraft/solace/fonts/Verdana.ttf" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/Flight.java" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/UI/ClickGUI/ClickGui.java" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/Movement/MovementUtil.java" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/workspace.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../../.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Font/Fonts.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Font/Fonts.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/Category.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/Category.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/Module.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/Module.java" afterDir="false" />
       <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Combat/KillAura.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Combat/KillAura.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiMainMenu.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiMainMenu.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/Speed.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/Speed.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/ClickGUI.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/ClickGUI.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/TargetHUD.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/TargetHUD.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Utils/Render/Render.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/Render/Render.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,8 +60,8 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$MCP_LOC$/src/minecraft/huysuh/Utils/Render" />
-    <property name="project.structure.last.edited" value="Artifacts" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
@@ -58,6 +72,7 @@
       <recent name="C:\Users\_\Documents\GitHub\Solace\workspace\src\minecraft\huysuh\Events\impl" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\_\Documents\GitHub\Solace\workspace\src\minecraft\assets\minecraft\solace\fonts" />
       <recent name="C:\Users\_\Documents\GitHub\Solace\workspace\src\minecraft\huysuh\Utils\Render" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
