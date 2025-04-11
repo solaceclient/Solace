@@ -152,7 +152,7 @@ public class HUD extends Module {
                 break;
 
             default:
-                drawText(Colors.color(clientName.charAt(0) + "&f" + clientName.substring(1)), x, y, getAccentColor(0));
+                drawText(Colors.color(clientName.charAt(0) + "&f" + clientName.substring(1) + "&7 [&f" + mc.debugFPS + " FPS&7]"), x, y, getAccentColor(0));
                 break;
         }
     }

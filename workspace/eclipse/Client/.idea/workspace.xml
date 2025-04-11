@@ -7,19 +7,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6aa848a-7a52-4752-89df-ccd64250f6ae" name="Default Changelist" comment="clickgui">
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/Notifs.java" afterDir="false" />
-      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/UI/Notification/Notifications.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/Module.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/Module.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Combat/KillAura.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Combat/KillAura.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/Sprint.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Movement/Sprint.java" afterDir="false" />
       <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/HUD.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/HUD.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/UI/ClickGUI/ClickGui.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/UI/ClickGUI/ClickGui.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/UI/GuiAlts.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/UI/GuiAlts.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiIngame.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiIngame.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiMainMenu.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/gui/GuiMainMenu.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/ItemRenderer.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/ItemRenderer.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
