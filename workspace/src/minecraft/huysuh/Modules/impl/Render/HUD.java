@@ -8,6 +8,8 @@ import huysuh.Modules.Category;
 import huysuh.Modules.Module;
 import huysuh.Settings.*;
 import huysuh.Solace;
+import huysuh.UI.Notification.Notifications;
+import huysuh.Utils.Colors;
 import huysuh.Utils.RainbowUtil;
 import huysuh.Utils.RenderUtil;
 import net.minecraft.client.gui.Gui;
@@ -47,20 +49,20 @@ public class HUD extends Module {
     }
 
     // Settings
-    private final BooleanSetting watermark = new BooleanSetting("Watermark", true);
-    private final BooleanSetting moduleList = new BooleanSetting("Module List", true);
-    private final BooleanSetting useCustomFont = new BooleanSetting("Custom Font", true);
-    private final ModeSetting style = new ModeSetting("Style", "Skeet", "Solid", "Simple", "Legacy");
-    private final ModeSetting colorMode = new ModeSetting("Color", "Static", "Rainbow", "Gradient", "Fade");
-    private final NumberSetting animSpeed = new NumberSetting("Speed", 200, 50, 500, 10);
-    private final NumberSetting spacing = new NumberSetting("Spacing", 1, 0, 3, 0.5);
-    private final ColorSetting primaryColor = new ColorSetting("Primary", new Color(124, 194, 91).getRGB());
-    private final ColorSetting secondaryColor = new ColorSetting("Secondary", new Color(255, 255, 255).getRGB());
-    private final ColorSetting backgroundColor = new ColorSetting("Background", new Color(10, 10, 10, 180).getRGB());
-    private final ModeSetting tagStyle = new ModeSetting("Tag Style", "SPACE", "DASH", "PARENTHESIS", "BRACKETS", "NONE");
-    private final NumberSetting scrollSpeed = new NumberSetting("Scroll Speed", 30, 5, 100, 5);
-    private final NumberSetting colorSpeed = new NumberSetting("Color Speed", 2, 0.5, 10, 0.5);
-    private final NumberSetting colorOffset = new NumberSetting("Y Offset", 0.1, 0.01, 0.5, 0.01);
+    public final BooleanSetting watermark = new BooleanSetting("Watermark", true);
+    public final BooleanSetting moduleList = new BooleanSetting("Module List", true);
+    public final BooleanSetting useCustomFont = new BooleanSetting("Custom Font", true);
+    public final ModeSetting style = new ModeSetting("Style", "Simple", "Solid", "Skeet", "Legacy");
+    public final ModeSetting colorMode = new ModeSetting("Color", "Fade", "Rainbow", "Gradient", "Static");
+    public final NumberSetting animSpeed = new NumberSetting("Speed", 200, 50, 500, 10);
+    public final NumberSetting spacing = new NumberSetting("Spacing", 1, 0, 3, 0.5);
+    public final ColorSetting primaryColor = new ColorSetting("Primary", 0xFFCE7388);
+    public final ColorSetting secondaryColor = new ColorSetting("Secondary", new Color(255, 255, 255).getRGB());
+    public final ColorSetting backgroundColor = new ColorSetting("Background", new Color(10, 10, 10, 180).getRGB());
+    public final ModeSetting tagStyle = new ModeSetting("Tag Style", "SPACE", "DASH", "PARENTHESIS", "BRACKETS", "NONE");
+    public final NumberSetting scrollSpeed = new NumberSetting("Scroll Speed", 30, 5, 100, 5);
+    public final NumberSetting colorSpeed = new NumberSetting("Color Speed", 2, 0.5, 10, 0.5);
+    public final NumberSetting colorOffset = new NumberSetting("Y Offset", 0.1, 0.01, 0.5, 0.01);
 
     public HUD() {
         super("HUD", "Customizable heads-up display", Category.RENDER, Keyboard.KEY_P);
@@ -73,11 +75,13 @@ public class HUD extends Module {
     @Override
     protected void onEnable() {
         rainbowUtil = new RainbowUtil((float)colorSpeed.getValue(), 0.5f, 1.0f);
+        Notifications.add("Warning", "This module does not turn on!", Notifications.NotificationType.WARNING);
     }
 
     @Override
     public void onEvent(Event e) {
         if (e instanceof EventRender2D) {
+            Notifications.updateSettings(this);
             this.setTag(style.getMode());
             onRender2D((EventRender2D) e);
         }
@@ -148,8 +152,7 @@ public class HUD extends Module {
                 break;
 
             default:
-                drawText(clientName, x, y, getAccentColor(0));
-                drawText(" " + version, x + getTextWidth(clientName), y, secondaryColor.getColor());
+                drawText(Colors.color(clientName.charAt(0) + "&f" + clientName.substring(1)), x, y, getAccentColor(0));
                 break;
         }
     }
@@ -336,7 +339,7 @@ public class HUD extends Module {
      * Gets the accent color based on position and current mode
      * @param yPos Y position for gradient/rainbow calculations
      */
-    private int getAccentColor(float yPos) {
+    public int getAccentColor(float yPos) {
         switch (colorMode.getMode()) {
             case "Rainbow":
                 float yOffset = yPos * (float)colorOffset.getValue();
@@ -404,6 +407,6 @@ public class HUD extends Module {
     }
 
     private CFontRenderer getFont() {
-        return Fonts.SF;
+        return Fonts.Verdana;
     }
 }

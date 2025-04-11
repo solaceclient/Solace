@@ -8,6 +8,7 @@ import huysuh.Events.impl.EventTick;
 import huysuh.Events.impl.EventPacketSend;
 import huysuh.Modules.Category;
 import huysuh.Modules.Module;
+import huysuh.Modules.impl.Render.HUD;
 import huysuh.Settings.BooleanSetting;
 import huysuh.Settings.ModeSetting;
 import huysuh.Settings.NumberSetting;
@@ -35,16 +36,17 @@ import java.util.stream.Collectors;
 
 public class KillAura extends Module {
 
-    public NumberSetting range = new NumberSetting("Range", 4.2, 3, 8, 1);
+    public NumberSetting range = new NumberSetting("Range", 4.2, 3, 8, 0.1);
     public BooleanSetting hurtIgnore = new BooleanSetting("Hurt Ignore", false);
     public NumberSetting minCps = new NumberSetting("Min CPS", 12, 5, 20, 1);
     public NumberSetting maxCps = new NumberSetting("Max CPS", 14, 5, 20, 1);
     public ModeSetting mode = new ModeSetting("Mode", "Single", "Switch", "Multi");
-    public NumberSetting switchDelay = new NumberSetting("Switch Delay", 50, 0, 2000, 0);
+    public NumberSetting switchDelay = new NumberSetting("Switch Delay", 50, 0, 2000, 1);
     public BooleanSetting render = new BooleanSetting("Show Target", true);
+    public ModeSetting renderMode = new ModeSetting("Show Target", "Exhibition", "Color");
 
     // Autoblock settings
-    public ModeSetting autoblock = new ModeSetting("Autoblock", "Normal", "Vanilla", "None");
+    public ModeSetting autoblock = new ModeSetting("Autoblock", "Fake", "Normal", "Vanilla", "None");
     public BooleanSetting mouseDownOnly = new BooleanSetting("Mouse Down Only", false);
 
     private Timer attackTimer = new Timer();
@@ -66,7 +68,7 @@ public class KillAura extends Module {
 
     public KillAura() {
         super("KillAura", "Attacks nearby players", Category.COMBAT, Keyboard.KEY_R);
-        this.addSettings(range, minCps, maxCps, hurtIgnore, mode, switchDelay, render, autoblock, mouseDownOnly);
+        this.addSettings(range, minCps, maxCps, hurtIgnore, mode, switchDelay, render, renderMode, autoblock, mouseDownOnly);
     }
 
     private List<EntityLivingBase> getTargets(boolean ignoreHurtTime) {
@@ -101,8 +103,7 @@ public class KillAura extends Module {
     }
 
     private boolean shouldBlock() {
-        return !autoblock.getMode().equals("None") &&
-                (!mouseDownOnly.isEnabled() || Mouse.isButtonDown(1));
+        return !autoblock.getMode().equals("None");
     }
 
     public void block(Entity target) {
@@ -173,6 +174,9 @@ public class KillAura extends Module {
 
     @Override
     public void onEvent(Event e) {
+
+        if (!isEnabled()){ return; }
+
         if (mc.theWorld == null || mc.thePlayer == null) { return; }
 
         if (switchIndex != 0 && !(mode.getMode().equals("Switch"))){
@@ -221,7 +225,7 @@ public class KillAura extends Module {
         }
 
         if (e instanceof EventRender2D && this.isEnabled()){
-            this.setTag(mode.getMode() + (autoblock.getMode().equals("None") ? "" : ", " + autoblock.getMode()));
+            this.setTag(mode.getMode());
         }
 
         if (e instanceof EventRender3D && isEnabled()) {
@@ -230,8 +234,18 @@ public class KillAura extends Module {
                 mc.thePlayer.rotationYawHead = serverYaw;
                 mc.thePlayer.rotationPitchHead = serverPitch;
 
+                Color color = new Color(((HUD)(Module.getModuleFromString("HUD"))).getAccentColor(0));
+
                 if (render.isEnabled()) {
-                    Render.drawRotatingEntityESP(target, target.hurtTime > 0 ? new Color(255, 100, 100) : new Color(200, 255, 100), 0.1f, true, (EventRender3D) e);
+                    switch (renderMode.getMode()){
+                        case "Exhibition":
+                            Render.drawRotatingEntityESP(target, target.hurtTime > 0 ? new Color(255, 100, 100) : new Color(200, 255, 100), 0.1f, true, (EventRender3D) e);
+                            break;
+                        case "Color":
+                            Render.drawRotatingEntityESP(target, color, 0.1f, true, (EventRender3D) e);
+                            break;
+
+                    }
                 }
             }
         }

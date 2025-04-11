@@ -2,7 +2,12 @@ package huysuh.UI;
 
 import com.bytespacegames.mcpauth.SessionUtils;
 import huysuh.Font.Fonts;
+import huysuh.Modules.Module;
+import huysuh.Modules.impl.Render.HUD;
+import huysuh.Utils.Colors;
 import huysuh.Utils.RainbowUtil;
+import huysuh.Utils.Render.Render;
+import huysuh.Utils.RenderUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.renderer.GlStateManager;
@@ -52,9 +57,9 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
 
     private static final int BLACK = 0xFF000000;
     private static final int DARK_GRAY = 0xFF101010;
-    private static final int GREEN = new Color(124, 194, 91).getRGB();
+    private static final int GREEN = ((HUD)(Module.getModuleFromString("HUD"))).getAccentColor(0);
     private static final int DARK_GREEN = new Color(60, 92, 44).getRGB();
-    private static final int TEXT_GREEN = new Color(124, 194, 91).getRGB();
+    private static final int TEXT_COLOR = ((HUD)(Module.getModuleFromString("HUD"))).getAccentColor(0);
     private static final int SELECTED_ACCOUNT_COLOR = 0x3000FF00;
 
     private float gridSize = 25;
@@ -119,14 +124,9 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
     @Override
     public void updateScreen() {
         animationTime += 0.01F;
-        rainbowUtil.update();
-
-        for (GuiButton button : this.buttonList) {
-            if (button instanceof ModernButton) {
-                ((ModernButton) button).updateRainbow();
-            }
-        }
     }
+
+    float scrollOffset = 0.0f;
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -134,19 +134,12 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
 
         drawAnimatedBackground(partialTicks);
 
-        Fonts.SF.drawCenteredStringWithShadow("Alt Manager", this.width / 2, 20, rainbowUtil.getRainbow());
-
-        Fonts.SF.drawCenteredStringWithShadow("Logged in as: " + mc.getSession().getUsername(),
-                this.width / 2, 40, TEXT_GREEN);
-
         int panelWidth = Math.min(400, this.width - 80);
         int panelHeight = this.height - 140;
         int panelLeft = (this.width - panelWidth) / 2;
         int panelTop = 60;
 
-        drawRect(panelLeft, panelTop, panelLeft + panelWidth, panelTop + panelHeight, DARK_GRAY);
-
-        drawRainbowLine(panelLeft, panelLeft + panelWidth, panelTop, 2);
+        Render.drawBorderedRect(panelLeft, panelTop, panelWidth, panelHeight, 1, 0xFF606070, 0xFF202026);
 
         int startY = panelTop + 10;
         int accountHeight = 38;
@@ -160,12 +153,11 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
                 boolean isHovered = mouseX >= panelLeft + 10 && mouseX <= panelLeft + 10 + accountWidth &&
                         mouseY >= accountY && mouseY <= accountY + accountHeight;
 
-                drawRect(panelLeft + 10, accountY, panelLeft + 10 + accountWidth, accountY + accountHeight,
-                        isHovered ? 0xFF151515 : DARK_GRAY);
+                Render.drawBorderedGradientRect(panelLeft + 10, accountY, accountWidth, accountHeight, 1, 0xFF353545, isHovered ? 0xFF28282c : 0xFF18181c, isHovered ? 0xFF44444b : 0xFF24242b, true);
 
                 if (index == selectedAccount) {
                     drawRectOutline(panelLeft + 10, accountY, panelLeft + 10 + accountWidth, accountY + accountHeight,
-                            rainbowUtil.getRainbow());
+                            TEXT_COLOR);
                 }
 
                 if (mc.getSession().getUsername().equals(account.username)) {
@@ -187,21 +179,19 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
                     }
                 }
 
-                Fonts.SF.drawStringWithShadow(account.username, panelLeft + 60, accountY + 10, TEXT_GREEN);
+                Fonts.Verdana.drawStringWithShadow(account.username, panelLeft + 60, accountY + 10, TEXT_COLOR);
 
-                String lastLoginStr = "Last login: " + formatTimestamp(account.lastLoginTime);
-                Fonts.SF.drawStringWithShadow(lastLoginStr, panelLeft + 60, accountY + 22, 0xFFAAAAAA);
+                String lastLoginStr = Colors.color("&o" + formatTimestamp(account.lastLoginTime));
+                Fonts.Verdana.drawStringWithShadow(lastLoginStr, panelLeft + 60, accountY + 22, 0xFFAAAAAA);
             }
         }
 
         if (!this.loginText.equals("init")) {
-            Fonts.SF.drawCenteredStringWithShadow(loginText, this.width / 2, this.height - 80, TEXT_GREEN);
+            Fonts.Verdana.drawCenteredStringWithShadow(loginText, this.width / 2, this.height - 80, TEXT_COLOR);
         }
 
-        String credits = "by huys & heart";
-        Fonts.SF.drawStringWithShadow(credits,
-                this.width - Fonts.SF.getStringWidth(credits) - 5,
-                this.height - 12, TEXT_GREEN);
+        Fonts.Verdana.drawCenteredStringWithShadow("Logged in as " + mc.getSession().getUsername(),
+                this.width / 2, 595, 0x65ffffff);
 
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
@@ -383,14 +373,9 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
         private float hoverAnimation = 0;
         private boolean wasHovered = false;
         private float outlineAlpha = 0.0f;
-        private RainbowUtil buttonRainbow = new RainbowUtil(10.0f, 0.8f, 1.0f);
 
         public ModernButton(int buttonId, int x, int y, int width, int height, String buttonText) {
             super(buttonId, x, y, width, height, buttonText);
-        }
-
-        public void updateRainbow() {
-            buttonRainbow.update();
         }
 
         @Override
@@ -406,25 +391,29 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
 
                 if (this.hovered) {
                     hoverAnimation = Math.min(1.0F, hoverAnimation + 0.08F);
-                    outlineAlpha = Math.min(1.0F, outlineAlpha + 0.1F);
+                    outlineAlpha = Math.min(1.0F, outlineAlpha + 0.2F);
                 } else {
                     hoverAnimation = Math.max(0.0F, hoverAnimation - 0.08F);
-                    outlineAlpha = Math.max(0.0F, outlineAlpha - 0.06F);
+                    outlineAlpha = Math.max(0.0F, outlineAlpha - 0.2F);
                 }
 
                 wasHovered = this.hovered;
 
-                drawRect(this.xPosition, this.yPosition, this.xPosition + this.width,
-                        this.yPosition + this.height, DARK_GRAY);
+                // Draw button background
+                Render.drawBorderedGradientRect(this.xPosition, this.yPosition, this.width,
+                        this.height, 1, 0xFF121218, this.hovered ? 0xFF28282c : 0xFF18181c, this.hovered ? 0xFF44444b : 0xFF24242b, true);
 
+                // Rainbow outline when hovered
                 if (outlineAlpha > 0) {
                     drawRainbowOutline(this.xPosition, this.yPosition, this.width, this.height, outlineAlpha);
                 }
 
-                int textColor = this.enabled ? TEXT_GREEN : 0xFF555555;
+                // Calculate text color
+                int textColor = TEXT_COLOR;
 
+                // Center and draw text
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                Fonts.SF.drawCenteredStringWithShadow(this.displayString,
+                Fonts.Verdana.drawCenteredStringWithShadow(this.displayString,
                         this.xPosition + this.width / 2,
                         this.yPosition + (this.height - 8) / 2, textColor);
             }
@@ -437,36 +426,23 @@ public class GuiAlts extends GuiScreen implements GuiYesNoCallback {
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 
             int thickness = 1;
-            Color rainbow1 = new Color(buttonRainbow.getRainbow());
+            Color rainbow1 = new Color(((HUD)(Module.getModuleFromString("HUD"))).getAccentColor(0));
             int segColor = new Color(rainbow1.getRed(), rainbow1.getGreen(), rainbow1.getBlue(),
                     (int)(alpha * 255)).getRGB();
 
+            // Draw rainbow segments around the button
             int segments = 8;
             int segLength = width / (segments / 2);
 
-            for (int i = 0; i < segments / 2; i++) {
-                int x1 = x + (i * segLength);
-                int x2 = Math.min(x + width, x1 + segLength);
-                drawRect(x1, y, x2, y + thickness, segColor);
-            }
 
-            for (int i = 0; i < segments / 4; i++) {
-                int y1 = y + (i * (height / (segments/4)));
-                int y2 = Math.min(y + height, y1 + (height / (segments/4)));
-                drawRect(x + width - thickness, y1, x + width, y2, segColor);
-            }
-
+            // Bottom outline with segments
             for (int i = segments / 2 - 1; i >= 0; i--) {
+
                 int x1 = x + (i * segLength);
                 int x2 = Math.min(x + width, x1 + segLength);
                 drawRect(x1, y + height - thickness, x2, y + height, segColor);
             }
 
-            for (int i = segments / 4 - 1; i >= 0; i--) {
-                int y1 = y + (i * (height / (segments/4)));
-                int y2 = Math.min(y + height, y1 + (height / (segments/4)));
-                drawRect(x, y1, x + thickness, y2, segColor);
-            }
 
             GlStateManager.enableTexture2D();
             GlStateManager.disableBlend();

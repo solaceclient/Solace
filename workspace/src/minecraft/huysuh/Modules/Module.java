@@ -1,9 +1,10 @@
 package huysuh.Modules;
 
 import huysuh.Events.Event;
+import huysuh.Modules.impl.Render.Notifs;
 import huysuh.Settings.Setting;
+import huysuh.UI.Notification.Notifications;
 import huysuh.Utils.Colors;
-import huysuh.Utils.Wrapper;
 import net.minecraft.client.Minecraft;
 
 import java.io.Serializable;
@@ -24,7 +25,7 @@ public class Module implements Serializable {
     private final List<Setting> settings = new ArrayList<>();
 
     // State management
-    private boolean enabled;
+    public boolean enabled;
     private boolean expanded;
     private int keyCode;
     private String tag = "";
@@ -71,6 +72,9 @@ public class Module implements Serializable {
             onEnable();
         } else {
             onDisable();
+        }
+        if (Notifs.toggleNotifications.isEnabled()){
+            Notifications.add(this.isEnabled() ? "Enabled" : "Disabled", this.getName(), this.isEnabled() ? Notifications.NotificationType.SUCCESS : Notifications.NotificationType.ERROR);
         }
     }
 

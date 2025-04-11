@@ -44,7 +44,7 @@ public class ClickGui extends GuiScreen {
     private int dragX, dragY;
 
     // Smooth scrolling
-    private static final float SCROLL_SMOOTHING = 0.3f; // Lower = smoother but slower
+    private static final float SCROLL_SMOOTHING = 0.1f; // Lower = smoother but slower
 
     // Color picker
     private boolean colorPickerOpen = false;

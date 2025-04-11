@@ -7,6 +7,8 @@ import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+
+import huysuh.UI.Notification.Notifications;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
@@ -367,6 +369,7 @@ public class GuiIngame extends Gui
 
         ScaledResolution sr = new ScaledResolution(mc);
         EventRender2D event = new EventRender2D(partialTicks, sr);
+        Notifications.render();
         event.fire();
     }
 

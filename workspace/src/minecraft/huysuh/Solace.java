@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 
 public class Solace {
-    public static final String name = "Solace";
-    public static final double version = 0.1;
+    public static final String name = "Scary";
+    public static final double version = 2.1;
 
     public static Minecraft mc;
 
@@ -32,7 +32,8 @@ public class Solace {
             new Speed(),
             new TargetHUD(),
             new Velocity(),
-            new Flight()
+            new Flight(),
+            new Notifs()
     ));
 
     private static final List<Event> tickEvents = new ArrayList<>(Collections.emptyList());

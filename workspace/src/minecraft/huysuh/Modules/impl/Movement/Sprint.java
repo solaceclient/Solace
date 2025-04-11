@@ -11,7 +11,7 @@ import org.lwjgl.input.Keyboard;
 
 public class Sprint extends Module {
 
-    private final ModeSetting mode = new ModeSetting("Mode", "Normal", "Normal", "Multi");
+    private final ModeSetting mode = new ModeSetting("Mode", "Normal", "Omni");
     private final Timer sprintTimer = new Timer();
 
     public Sprint() {
@@ -28,7 +28,7 @@ public class Sprint extends Module {
 
             boolean shouldSprint = mc.thePlayer.getFoodStats().getFoodLevel() > 6 && !mc.thePlayer.isSneaking() && !mc.thePlayer.isCollidedHorizontally;
 
-            if (mode.getMode().equals("Multi")) {
+            if (mode.getMode().equals("Omni")) {
                 shouldSprint = shouldSprint && (mc.thePlayer.moveForward != 0 || mc.thePlayer.moveStrafing != 0);
             } else {
                 shouldSprint = shouldSprint && mc.thePlayer.moveForward > 0;

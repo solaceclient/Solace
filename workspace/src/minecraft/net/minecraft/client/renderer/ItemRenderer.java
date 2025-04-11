@@ -4,6 +4,7 @@ import huysuh.Events.impl.EventTransformFirstPersonItem;
 import huysuh.Modules.Module;
 import huysuh.Modules.impl.Combat.KillAura;
 import huysuh.Modules.impl.Render.Animations;
+import huysuh.Utils.Wrapper;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -21,10 +22,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemMap;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.potion.Potion;
 import net.minecraft.src.Config;
 import net.minecraft.util.*;
@@ -366,6 +364,17 @@ public class ItemRenderer
         GlStateManager.rotate(60.0F, 0.0F, 1.0F, 0.0F);
     }
 
+    private boolean fakeBlock(){
+        KillAura ka = (KillAura)Module.getModuleFromString("KillAura");
+        if (ka == null) { return false; }
+        if (mc.thePlayer.getHeldItem() != null){
+            if (!(mc.thePlayer.getHeldItem().getItem() instanceof ItemSword)){
+                return false;
+            }
+        }
+        return ka.isEnabled() && !(ka.autoblock.getMode().equals("None")) && KillAura.target != null;
+    }
+
     public void doBlockAnimation(String anim, float f, float f1) {
         switch (anim) {
             case "Virtue":
@@ -518,7 +527,7 @@ public class ItemRenderer
                 {
                     this.renderItemMap(abstractclientplayer, f2, f, f1);
                 }
-                else if (abstractclientplayer.getItemInUseCount() > 0)
+                else if (abstractclientplayer.getItemInUseCount() > 0 || fakeBlock())
                 {
                     EnumAction enumaction = this.itemToRender.getItemUseAction();
 

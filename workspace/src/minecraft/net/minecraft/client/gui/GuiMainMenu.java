@@ -1,11 +1,15 @@
 package net.minecraft.client.gui;
 
 import huysuh.Font.Fonts;
+import huysuh.Modules.Module;
+import huysuh.Modules.impl.Render.HUD;
 import huysuh.UI.GuiAlts;
 import huysuh.Utils.RainbowUtil;
 
 import java.awt.*;
 import java.io.IOException;
+
+import huysuh.Utils.Render.Render;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -30,7 +34,7 @@ public class GuiMainMenu extends GuiScreen {
     private static final int DARK_GRAY = 0xFF101010;
     private static final int GREEN = new Color(124, 194, 91).getRGB();
     private static final int DARK_GREEN = new Color(60, 92, 44).getRGB();
-    private static final int TEXT_GREEN = new Color(124, 194, 91).getRGB();
+    private static final int TEXT_COLOR = ((HUD)(Module.getModuleFromString("HUD"))).getAccentColor(0);
 
     // Grid settings
     private float gridSize = 25;
@@ -48,13 +52,13 @@ public class GuiMainMenu extends GuiScreen {
         int yPos = baseButtonY;
 
         // Main menu buttons
-        this.buttonList.add(new ModernButton(1, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, I18n.format("menu.singleplayer")));
+        this.buttonList.add(new ModernButton(1, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, "Singleplayer"));
         yPos += buttonHeight + buttonSpacing;
 
-        this.buttonList.add(new ModernButton(2, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, I18n.format("menu.multiplayer")));
+        this.buttonList.add(new ModernButton(2, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, "Multiplayer"));
         yPos += buttonHeight + buttonSpacing;
 
-        this.buttonList.add(new ModernButton(0, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, I18n.format("menu.options")));
+        this.buttonList.add(new ModernButton(0, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, "Options"));
         yPos += buttonHeight + buttonSpacing;
 
         this.buttonList.add(new ModernButton(4, this.width / 2 - buttonWidth / 2, yPos, buttonWidth, buttonHeight, "Alt Manager"));
@@ -63,14 +67,6 @@ public class GuiMainMenu extends GuiScreen {
     @Override
     public void updateScreen() {
         animationTime += 0.01F;
-        rainbowUtil.update();
-
-        // Update each button's rainbow effect
-        for (GuiButton button : this.buttonList) {
-            if (button instanceof ModernButton) {
-                ((ModernButton) button).updateRainbow();
-            }
-        }
     }
 
     @Override
@@ -141,35 +137,16 @@ public class GuiMainMenu extends GuiScreen {
         GlStateManager.disableBlend();
     }
 
-    private void drawRainbowLine(int startX, int endX, int y, int thickness) {
-        int segments = 20;
-        int segmentWidth = (endX - startX) / segments;
-
-        for (int i = 0; i < segments; i++) {
-            int x1 = startX + (i * segmentWidth);
-            int x2 = x1 + segmentWidth;
-
-            drawRect(x1, y, x2, y + thickness, rainbowUtil.getRainbow());
-        }
-    }
-
-    private float[] getColorComponents(int color) {
-        float r = ((color >> 16) & 0xFF) / 255.0f;
-        float g = ((color >> 8) & 0xFF) / 255.0f;
-        float b = (color & 0xFF) / 255.0f;
-        return new float[]{r, g, b};
-    }
-
     private void drawVersionInfo() {
         // Version text in bottom left
         String version = "1.8.9";
-        Fonts.SF.drawStringWithShadow(version, 5, this.height - 12, TEXT_GREEN);
+        Fonts.Verdana.drawStringWithShadow(version, 5, this.height - 12, TEXT_COLOR);
 
         // Credits text in bottom right
         String credits = "by huys & heart";
-        Fonts.SF.drawStringWithShadow(credits,
-                this.width - Fonts.SF.getStringWidth(credits) - 5,
-                this.height - 12, TEXT_GREEN);
+        Fonts.Verdana.drawStringWithShadow(credits,
+                this.width - Fonts.Verdana.getStringWidth(credits) - 5,
+                this.height - 12, TEXT_COLOR);
     }
 
     @Override
@@ -182,21 +159,13 @@ public class GuiMainMenu extends GuiScreen {
         return false;
     }
 
-    // Modern button implementation with rainbow effect
     public class ModernButton extends GuiButton {
         private float hoverAnimation = 0;
         private boolean wasHovered = false;
         private float outlineAlpha = 0.0f;
-        private RainbowUtil buttonRainbow = new RainbowUtil(10.0f, 0.8f, 1.0f);
-        private float currentHue = 0f;
 
         public ModernButton(int buttonId, int x, int y, int width, int height, String buttonText) {
             super(buttonId, x, y, width, height, buttonText);
-            // Set different starting hues for each button to create a nice effect
-        }
-
-        public void updateRainbow() {
-            buttonRainbow.update();
         }
 
         @Override
@@ -212,17 +181,17 @@ public class GuiMainMenu extends GuiScreen {
 
                 if (this.hovered) {
                     hoverAnimation = Math.min(1.0F, hoverAnimation + 0.08F);
-                    outlineAlpha = Math.min(1.0F, outlineAlpha + 0.1F);
+                    outlineAlpha = Math.min(1.0F, outlineAlpha + 0.2F);
                 } else {
                     hoverAnimation = Math.max(0.0F, hoverAnimation - 0.08F);
-                    outlineAlpha = Math.max(0.0F, outlineAlpha - 0.06F);
+                    outlineAlpha = Math.max(0.0F, outlineAlpha - 0.2F);
                 }
 
                 wasHovered = this.hovered;
 
                 // Draw button background
-                drawRect(this.xPosition, this.yPosition, this.xPosition + this.width,
-                        this.yPosition + this.height, DARK_GRAY);
+                Render.drawBorderedGradientRect(this.xPosition, this.yPosition, this.width,
+                        this.height, 1, 0xFF121218, this.hovered ? 0xFF28282c : 0xFF18181c, this.hovered ? 0xFF44444b : 0xFF24242b, true);
 
                 // Rainbow outline when hovered
                 if (outlineAlpha > 0) {
@@ -230,11 +199,11 @@ public class GuiMainMenu extends GuiScreen {
                 }
 
                 // Calculate text color
-                int textColor = TEXT_GREEN;
+                int textColor = TEXT_COLOR;
 
                 // Center and draw text
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                Fonts.SF.drawCenteredStringWithShadow(this.displayString,
+                Fonts.Verdana.drawCenteredStringWithShadow(this.displayString,
                         this.xPosition + this.width / 2,
                         this.yPosition + (this.height - 8) / 2, textColor);
             }
@@ -247,7 +216,7 @@ public class GuiMainMenu extends GuiScreen {
             GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
 
             int thickness = 1;
-            Color rainbow1 = new Color(buttonRainbow.getRainbow());
+            Color rainbow1 = new Color(((HUD)(Module.getModuleFromString("HUD"))).getAccentColor(0));
             int segColor = new Color(rainbow1.getRed(), rainbow1.getGreen(), rainbow1.getBlue(),
                     (int)(alpha * 255)).getRGB();
 
@@ -255,21 +224,6 @@ public class GuiMainMenu extends GuiScreen {
             int segments = 8;
             int segLength = width / (segments / 2);
 
-            // Top outline with segments
-            for (int i = 0; i < segments / 2; i++) {
-
-                int x1 = x + (i * segLength);
-                int x2 = Math.min(x + width, x1 + segLength);
-                drawRect(x1, y, x2, y + thickness, segColor);
-            }
-
-            // Right outline
-            for (int i = 0; i < segments / 4; i++) {
-
-                int y1 = y + (i * (height / (segments/4)));
-                int y2 = Math.min(y + height, y1 + (height / (segments/4)));
-                drawRect(x + width - thickness, y1, x + width, y2, segColor);
-            }
 
             // Bottom outline with segments
             for (int i = segments / 2 - 1; i >= 0; i--) {
@@ -279,13 +233,6 @@ public class GuiMainMenu extends GuiScreen {
                 drawRect(x1, y + height - thickness, x2, y + height, segColor);
             }
 
-            // Left outline
-            for (int i = segments / 4 - 1; i >= 0; i--) {
-
-                int y1 = y + (i * (height / (segments/4)));
-                int y2 = Math.min(y + height, y1 + (height / (segments/4)));
-                drawRect(x, y1, x + thickness, y2, segColor);
-            }
 
             GlStateManager.enableTexture2D();
             GlStateManager.disableBlend();
