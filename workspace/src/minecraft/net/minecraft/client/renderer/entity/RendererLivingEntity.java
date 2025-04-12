@@ -3,6 +3,9 @@ package net.minecraft.client.renderer.entity;
 import com.google.common.collect.Lists;
 import java.nio.FloatBuffer;
 import java.util.List;
+
+import huysuh.Events.Event;
+import huysuh.Events.impl.EventRenderEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.FontRenderer;
@@ -110,6 +113,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
     {
         if (!Reflector.RenderLivingEvent_Pre_Constructor.exists() || !Reflector.postForgeBusEvent(Reflector.RenderLivingEvent_Pre_Constructor, new Object[] {entity, this, Double.valueOf(x), Double.valueOf(y), Double.valueOf(z)}))
         {
+
             if (animateModelLiving)
             {
                 entity.limbSwingAmount = 1.0F;
@@ -339,6 +343,10 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
      */
     protected void renderModel(T entitylivingbaseIn, float p_77036_2_, float p_77036_3_, float p_77036_4_, float p_77036_5_, float p_77036_6_, float scaleFactor)
     {
+        EventRenderEntity event = new EventRenderEntity(entitylivingbaseIn);
+        event.fire(Event.Era.PRE);
+        if (event.isCancelled()) { return; }
+
         boolean flag = !entitylivingbaseIn.isInvisible();
         boolean flag1 = !flag && !entitylivingbaseIn.isInvisibleToPlayer(Minecraft.getMinecraft().thePlayer);
 
@@ -369,6 +377,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
                 GlStateManager.depthMask(true);
             }
         }
+        event.fire(Event.Era.POST);
     }
 
     protected boolean setDoRenderBrightness(T entityLivingBaseIn, float partialTicks)

@@ -11,7 +11,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 
+import huysuh.Events.Event;
 import huysuh.Events.impl.EventRender3D;
+import huysuh.Events.impl.EventRenderHand;
+import huysuh.Modules.Module;
+import huysuh.Modules.impl.Render.NoHurtCam;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBed;
 import net.minecraft.block.material.Material;
@@ -676,6 +680,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
     private void hurtCameraEffect(float partialTicks)
     {
+        if (Module.getModuleFromString("NoHurtCam").isEnabled()){ return; }
         if (this.mc.getRenderViewEntity() instanceof EntityLivingBase)
         {
             EntityLivingBase entitylivingbase = (EntityLivingBase)this.mc.getRenderViewEntity();
@@ -974,6 +979,9 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
     public void renderHand(float p_renderHand_1_, int p_renderHand_2_, boolean p_renderHand_3_, boolean p_renderHand_4_, boolean p_renderHand_5_)
     {
+        EventRenderHand event = new EventRenderHand();
+        event.fire(Event.Era.PRE);
+        if (event.isCancelled()) { return; }
         if (!this.debugView)
         {
             GlStateManager.matrixMode(5889);
@@ -1051,6 +1059,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
                 this.setupViewBobbing(p_renderHand_1_);
             }
         }
+        event.fire(Event.Era.POST);
     }
 
     public void disableLightmap()

@@ -1,12 +1,14 @@
 package huysuh.Utils;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiPlayerTabOverlay;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -19,6 +21,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Wrapper {
+
+    public static boolean hasWallBetweenEntities(Entity entity, EntityPlayer player) {
+        Vec3 entityPos = new Vec3(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ);
+        Vec3 playerPos = new Vec3(player.posX, player.posY + player.getEyeHeight(), player.posZ);
+
+        double dx = playerPos.xCoord - entityPos.xCoord;
+        double dy = playerPos.yCoord - entityPos.yCoord;
+        double dz = playerPos.zCoord - entityPos.zCoord;
+
+        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        int steps = (int) (distance * 1.5); // Adjust step count for accuracy
+
+        double stepX = dx / steps;
+        double stepY = dy / steps;
+        double stepZ = dz / steps;
+
+        for (int i = 0; i < steps; i++) {
+            double checkX = entityPos.xCoord + stepX * i;
+            double checkY = entityPos.yCoord + stepY * i;
+            double checkZ = entityPos.zCoord + stepZ * i;
+
+            BlockPos blockPos = new BlockPos(checkX, checkY, checkZ);
+            IBlockState blockState = mc.theWorld.getBlockState(blockPos);
+
+            if (!blockState.getBlock().isPassable(mc.theWorld, blockPos)) {
+                return true; // A wall is found
+            }
+        }
+
+        return false; // No wall is found
+    }
 
     public static float returnNegative(float number) {
         return Math.abs(number)*-1;

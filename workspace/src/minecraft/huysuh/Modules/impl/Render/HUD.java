@@ -75,7 +75,6 @@ public class HUD extends Module {
     @Override
     protected void onEnable() {
         rainbowUtil = new RainbowUtil((float)colorSpeed.getValue(), 0.5f, 1.0f);
-        Notifications.add("Warning", "This module does not turn on!", Notifications.NotificationType.WARNING);
     }
 
     @Override

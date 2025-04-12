@@ -7,9 +7,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d6aa848a-7a52-4752-89df-ccd64250f6ae" name="Default Changelist" comment="clickgui">
+      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Events/impl/EventRenderEntity.java" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Events/impl/EventRenderHand.java" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/Chams.java" afterDir="false" />
+      <change afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/NoHurtCam.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/HUD.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Modules/impl/Render/HUD.java" afterDir="false" />
-      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/Minecraft.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Solace.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/huysuh/Utils/Wrapper.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/huysuh/Utils/Wrapper.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/EntityRenderer.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/EntityRenderer.java" afterDir="false" />
+      <change beforePath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/entity/RendererLivingEntity.java" beforeDir="false" afterPath="$MCP_LOC$/src/minecraft/net/minecraft/client/renderer/entity/RendererLivingEntity.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,6 +67,8 @@
       <recent name="C:\Users\_\Documents\GitHub\Solace\workspace\src\minecraft\huysuh\Utils\Render" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="huysuh.Events.impl" />
+      <recent name="huysuh.Modules.impl.Render" />
       <recent name="huysuh.Modules.impl.Movement" />
     </key>
   </component>

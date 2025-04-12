@@ -33,7 +33,9 @@ public class Solace {
             new TargetHUD(),
             new Velocity(),
             new Flight(),
-            new Notifs()
+            new Notifs(),
+            new NoHurtCam(),
+            new Chams()
     ));
 
     private static final List<Event> tickEvents = new ArrayList<>(Collections.emptyList());
